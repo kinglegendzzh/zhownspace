@@ -143,11 +143,13 @@ export default {
   font-size: 2em;
   white-space: nowrap;
   overflow: hidden;
+  padding: 5px;
 }
 
 .animated-title-custom {
   white-space: nowrap;
   overflow: hidden;
+  padding: 5px;
 }
 
 .caret {

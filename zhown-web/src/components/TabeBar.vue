@@ -2,9 +2,15 @@
   <el-tabs v-model="activeName" @tab-click="handleClick" type="card">
      <el-tab-pane label="我的产品" name="product">
      </el-tab-pane>
-    <el-tab-pane label="我的文章" name="page"></el-tab-pane>
-    <el-tab-pane label="我的代码实验室" name="code"></el-tab-pane>
-    <el-tab-pane label="我的音乐" name="second"></el-tab-pane>
+    <el-tab-pane label="我的文章" name="page">
+
+    </el-tab-pane>
+    <el-tab-pane label="我的代码实验室" name="code">
+
+    </el-tab-pane>
+    <el-tab-pane label="我的音乐" name="second">
+      <AudioWaveform></AudioWaveform>
+    </el-tab-pane>
     <el-tab-pane label="我的艺术画廊" name="third">
       <my-card></my-card>
     </el-tab-pane>
@@ -13,11 +19,13 @@
 </template>
 <script>
 import MyCard from "@/components/mini/MyCard.vue";
+import AudioWaveform from "@/components/audio/AudioWaveform.vue";
 
   export default {
     name: "TabeBar",
     components: {
-      MyCard
+      MyCard,
+      AudioWaveform,
     },
     data() {
       return {
@@ -31,7 +39,7 @@ import MyCard from "@/components/mini/MyCard.vue";
           },
           {name: 'code', img: "linear-gradient(-225deg, #000000 0%, #52057B 48%, #892CDC 100%)", textColor: "#cfa5ef", desc: "开源主义，互联网的共产精神。"
             , label: "章浩的代码实验室"},
-          {name: 'second', img: "linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%)", textColor: "#10439F", desc: "和弦、旋律、节奏，构建20,000赫茲的听觉艺术。"
+          {name: 'second', img: "linear-gradient(to top, #fe5196 0%, #f77062 100%)", textColor: "#060073", desc: "和弦、旋律、节奏，构建20,000赫茲的听觉艺术。"
           , label: "章浩的音乐"},
           {name: 'third', img: "linear-gradient(-225deg, #69EACB 0%, #EACCF8 48%, #6654F1 100%)", textColor: "#1a4870", desc: "艺术是发送者与接受者之间达成的契约，“发送”不可强加，“接收”也不是纯粹关照。"
           , label: "章浩的艺术画廊"},
