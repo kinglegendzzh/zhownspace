@@ -6,7 +6,7 @@
 
     </el-tab-pane>
     <el-tab-pane label="我的代码实验室" name="code">
-
+      <virtual-m-i-d-i></virtual-m-i-d-i>
     </el-tab-pane>
     <el-tab-pane label="我的音乐" name="second">
       <AudioWaveform></AudioWaveform>
@@ -20,12 +20,14 @@
 <script>
 import MyCard from "@/components/mini/MyCard.vue";
 import AudioWaveform from "@/components/audio/AudioWaveform.vue";
+import virtualMIDI from "@/components/audio/virtualMIDI.vue";
 
   export default {
     name: "TabeBar",
     components: {
       MyCard,
       AudioWaveform,
+      virtualMIDI,
     },
     data() {
       return {
