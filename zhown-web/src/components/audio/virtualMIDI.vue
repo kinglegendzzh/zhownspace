@@ -5,6 +5,7 @@
          :id="'key-' + note.midi"
          :class="['piano-key', note.isBlack ? 'black-key' : 'white-key']"
          :ref="'key-' + note.midi">
+      <div v-if="note.label" class="key-label">{{ note.label }}</div>
     </div>
   </div>
 </template>
@@ -16,39 +17,52 @@ export default {
       midiAccess: null,
       inputs: [],
       keyMapping: {
-        'A': 57, // C4
-        'W': 58, // C#4
-        'S': 59, // D4
-        'E': 60, // D#4
-        'D': 61, // E4
-        'F': 62, // F4
-        'T': 63, // F#4
-        'G': 64, // G4
-        'Y': 65, // G#4
-        'H': 66, // A4
-        'U': 67, // A#4
-        'J': 68, // B4
-        'K': 69,  // C5
-        'O': 70,
-        'L': 71,
-        'P': 72,
+        'A': 36, // C2
+        'W': 37, // C#2
+        'S': 38, // D2
+        'E': 39, // D#2
+        'D': 40, // E2
+        'F': 41, // F2
+        'T': 42, // F#2
+        'G': 43, // G2
+        'Y': 44, // G#2
+        'H': 45, // A2
+        'U': 46, // A#2
+        'J': 47, // B2
+        'K': 48,  // C3
+        'O': 49,
+        'L': 50,
+        'P': 51,
+        // 添加更多键位映射到你需要的音符
       },
-      keys: this.generateKeys()
+      keys: []
     };
   },
-  mounted() {
-    if (navigator.requestMIDIAccess) {
-      navigator.requestMIDIAccess().then(this.onMIDISuccess, this.onMIDIFailure);
-    } else {
-      console.error('Web MIDI API is not supported in this browser.');
-    }
-    window.addEventListener('keydown', this.handleKeyDown);
-    window.addEventListener('keyup', this.handleKeyUp);
-  },
-  beforeDestroy() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-    window.removeEventListener('keyup', this.handleKeyUp);
-  },
+mounted() {
+  this.keys = this.generateKeys();
+
+  // 请求 MIDI 访问
+  if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess().then(this.onMIDISuccess, this.onMIDIFailure);
+  } else {
+    console.error('Web MIDI API is not supported in this browser.');
+  }
+
+  // 监听键盘事件
+  window.addEventListener('keydown', this.handleKeyDown);
+  window.addEventListener('keyup', this.handleKeyUp);
+},
+
+beforeDestroy() {
+  window.removeEventListener('keydown', this.handleKeyDown);
+  window.removeEventListener('keyup', this.handleKeyUp);
+
+  if (this.inputs.length > 0) {
+    this.inputs.forEach(input => {
+      input.onmidimessage = null;
+    });
+  }
+},
   methods: {
     generateKeys() {
       const notes = [
@@ -67,12 +81,21 @@ export default {
       ];
 
       let keys = [];
-      for (let i = 0; i < 7; i++) { // Render 7 octaves (C1 to B7)
+      for (let i = 0; i < 5; i++) { // 生成从C2到C6的音符
         notes.forEach((note, index) => {
-          keys.push({
-            midi: 21 + i * 12 + index,
-            ...note
-          });
+          const midi = 36 + i * 12 + index;
+          if (midi >= 36 && midi <= 84) {
+            const key = {
+              midi,
+              ...note
+            };
+            // 查找是否有映射的字母
+            const label = Object.keys(this.keyMapping).find(key => this.keyMapping[key] === midi);
+            if (label) {
+              key.label = label;
+            }
+            keys.push(key);
+          }
         });
       }
 
@@ -91,8 +114,10 @@ export default {
     handleMIDIMessage(event) {
       const [command, note, velocity] = event.data;
       if (command === 144) { // Note on
+        console.log('note on', note, velocity)
         this.renderKey(note, velocity);
       } else if (command === 128) { // Note off
+        console.log('note off', note, velocity)
         this.renderKey(note, 0);
       }
     },
@@ -154,6 +179,20 @@ export default {
 }
 
 .piano-key.active {
-  background: yellow;
+  background: #8a8a8a;
+}
+
+.key-label {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: white;
+  z-index: 3;
+}
+
+.white-key .key-label {
+  color: black;
 }
 </style>
