@@ -13,11 +13,10 @@ class AudioManager {
         this.sampler = null;
         this.gainNode = null;
         this.filterNode = null;
-        this.setupAudio();
+        this.setupAudio(this.tones["acoustic_grand_piano"]);
     }
 
-    setupAudio() {
-        this.url = this.tones.acoustic_grand_piano;
+    setupAudio(url) {
         // 使用正确的 Soundfont 音色库 URL
         this.sampler = new Tone.Sampler({
             urls: {
@@ -47,7 +46,7 @@ class AudioManager {
                 "Bb4": "Bb4.mp3",
                 "B4": "B4.mp3",
             },
-            baseUrl: this.url,
+            baseUrl: url,
             onload: () => {
                 console.log("Sampler loaded successfully!");
             }

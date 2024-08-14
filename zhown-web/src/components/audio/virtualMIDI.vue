@@ -22,9 +22,18 @@
           showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘'
         }}
       </el-button>
+      <el-button size="small" type="primary" @click="toggleToneLibrary" plain round>切换音色库</el-button>
     </div>
 
-    <AudioPlay></AudioPlay>
+    <!-- 音色库窗口 -->
+    <div v-if="showToneLibrary" class="tone-library-popup" ref="toneLibrary" @mousedown="startToneDrag">
+      <span style="color: #505050">音色库</span>
+      <ul style="color: #8a8a8a">
+        <li v-for="(url, toneName) in audioManager().tones" :key="toneName" @click="selectTone(toneName)">
+          {{ toneName }}
+        </li>
+      </ul>
+    </div>
 
     <!-- 和弦序列弹窗 -->
     <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
@@ -42,10 +51,8 @@
 <script>
 import Api from "@/utils/api";
 import audioManager from "@/utils/audioManager";
-import AudioPlay from "@/components/audio/AudioPlay.vue";
 
 export default {
-  components: {AudioPlay},
   data() {
     return {
       midiAccess: null,
@@ -82,6 +89,7 @@ export default {
       dragOffsetX: 0,
       dragOffsetY: 0,
       showPopup: true, // 控制弹窗显示/隐藏的标识
+      showToneLibrary: false, // 控制音色库窗口显示/隐藏的标识
     };
   },
   mounted() {
@@ -110,6 +118,9 @@ export default {
     }
   },
   methods: {
+    audioManager() {
+      return audioManager
+    },
     playNote(note) {
       audioManager.playNote(note); // 使用音频管理器播放音符
     },
@@ -225,6 +236,17 @@ export default {
       if (index !== -1) {
         this.stopNote(noteName);
         this.activeNotes.splice(index, 1);
+
+        if (this.activeNotes.length === 0) {
+          // 当前活跃按下音符为0，且上次音符数 >= 3，才记录新和弦
+          if (this.maxNotesCount >= 3) {
+            this.addChordToSequence(this.maxChord);
+          }
+          // 重置最大音符计数器
+          this.maxNotesCount = 0;
+          this.maxChord = '';
+        }
+
         if (this.activeNotes.length < 3) {
           // 当音符数量少于3时，不更新 recognizedChord，保持当前的 maxChord
           this.onOff = true;
@@ -245,8 +267,9 @@ export default {
               }))
               .sort((a, b) => a.midi - b.midi)
               .map(noteObj => noteObj.name);
+
+          // 只在当前音符数大于等于上次记录的最大音符数时更新和弦
           if (this.activeNotes.length >= this.maxNotesCount || this.onOff) {
-            console.log('this.preNotes, this.activeNotes', this.preNotes, this.activeNotes)
             const response = await Api.post('/chord/recognize/', {
               notes: sortedNotes // 传递排序后的音符列表
             });
@@ -255,9 +278,6 @@ export default {
             this.recognizedChord = chordName; // 更新和弦显示
             this.onOff = false;
             this.maxNotesCount = this.activeNotes.length;
-          }
-          if (this.recognizedChord) {
-            this.addChordToSequence(this.recognizedChord);
           }
         } catch (error) {
           console.error('Chord recognition failed', error);
@@ -312,6 +332,22 @@ export default {
     },
     togglePopup() {
       this.showPopup = !this.showPopup; // 切换弹窗的显示/隐藏状态
+    },
+    toggleToneLibrary() {
+      this.showToneLibrary = !this.showToneLibrary; // 切换音色库窗口的显示/隐藏状态
+    },
+    selectTone(toneName) {
+      audioManager.url = audioManager.tones[toneName];
+      audioManager.setupAudio(audioManager.url);
+      this.showToneLibrary = false; // 选择音色后隐藏音色库窗口
+    },
+    startToneDrag(event) {
+      this.isDragging = true;
+      const toneLibrary = this.$refs.toneLibrary;
+      this.dragOffsetX = event.clientX - toneLibrary.getBoundingClientRect().left;
+      this.dragOffsetY = event.clientY - toneLibrary.getBoundingClientRect().top;
+      document.addEventListener('mousemove', this.drag);
+      document.addEventListener('mouseup', this.stopDrag);
     },
   }
 }
@@ -385,7 +421,7 @@ export default {
 .chord-sequence-popup {
   position: fixed;
   width: 200px;
-  height: 400px;
+  height: 300px;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -393,7 +429,7 @@ export default {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   cursor: move;
   overflow: auto;
-  top: 70%;
+  top: 100px;
   right: 20px;
   z-index: 9;
   opacity: 0.9;
@@ -429,5 +465,38 @@ export default {
   align-items: center;
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
+}
+
+.tone-library-popup {
+  position: fixed;
+  width: 200px;
+  height: 150px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  cursor: move;
+  overflow: auto;
+  top: 600px;
+  right: 20px;
+  z-index: 9;
+  opacity: 0.9;
+}
+
+.tone-library-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tone-library-popup li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.tone-library-popup li:hover {
+  background-color: #e0e0e0;
 }
 </style>
