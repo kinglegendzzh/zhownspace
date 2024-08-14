@@ -505,7 +505,7 @@ export default {
   overflow: auto;
   top: 600px;
   right: 20px;
-  z-index: 9;
+  z-index: 10;
   opacity: 0.9;
 }
 

@@ -49,7 +49,8 @@ class AudioManager {
             baseUrl: url,
             onload: () => {
                 console.log("Sampler loaded successfully!");
-            }
+            },
+            release: 1.5, // 设置默认的 release 时间为 1.5 秒
         }).toDestination();
 
         // 创建 Web Audio API 的 GainNode 和 FilterNode
@@ -72,7 +73,8 @@ class AudioManager {
 
     stopNote(note) {
         if (this.sampler) {
-            this.sampler.triggerRelease(note);
+            // 使用 triggerRelease 方法来实现自然衰减
+            this.sampler.triggerRelease(note, "+0", 1.5); // 1.5s 的 release 时间
         }
     }
 
