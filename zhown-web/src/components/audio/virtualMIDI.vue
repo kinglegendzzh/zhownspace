@@ -190,7 +190,7 @@ export default {
           console.error('Chord recognition failed', error);
         }
       } else {
-        this.recognizedChord = ''; // 如果音符少于三个，则清空识别结果
+        // this.recognizedChord = ''; // 如果音符少于三个，则清空识别结果
       }
     },
   }
