@@ -8,7 +8,9 @@
            :key="note.midi"
            :id="'key-' + note.midi"
            :class="['piano-key', note.isBlack ? 'black-key' : 'white-key']"
-           :ref="'key-' + note.midi">
+           :ref="'key-' + note.midi"
+           @mousedown="playNote(midiToNoteName(note.midi))"
+           @mouseup="stopNote(midiToNoteName(note.midi))">
         <div v-if="note.label" class="key-label">{{ note.label }}</div>
       </div>
     </div>
@@ -21,6 +23,8 @@
         }}
       </el-button>
     </div>
+
+    <AudioPlay></AudioPlay>
 
     <!-- 和弦序列弹窗 -->
     <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
@@ -37,29 +41,32 @@
 
 <script>
 import Api from "@/utils/api";
+import audioManager from "@/utils/audioManager";
+import AudioPlay from "@/components/audio/AudioPlay.vue";
 
 export default {
+  components: {AudioPlay},
   data() {
     return {
       midiAccess: null,
       inputs: [],
       keyMapping: {
-        'A': 36, // C2
-        'W': 37, // C#2
-        'S': 38, // D2
-        'E': 39, // D#2
-        'D': 40, // E2
-        'F': 41, // F2
-        'T': 42, // F#2
-        'G': 43, // G2
-        'Y': 44, // G#2
-        'H': 45, // A2
-        'U': 46, // A#2
-        'J': 47, // B2
-        'K': 48,  // C3
-        'O': 49,
-        'L': 50,
-        'P': 51,
+        'A': 48, // C2
+        'W': 49, // C#2
+        'S': 50, // D2
+        'E': 51, // D#2
+        'D': 52, // E2
+        'F': 53, // F2
+        'T': 54, // F#2
+        'G': 55, // G2
+        'Y': 56, // G#2
+        'H': 57, // A2
+        'U': 58, // A#2
+        'J': 59, // B2
+        'K': 60,  // C3
+        'O': 61,
+        'L': 62,
+        'P': 63,
         // 添加更多键位映射到你需要的音符
       },
       keys: [],
@@ -103,6 +110,12 @@ export default {
     }
   },
   methods: {
+    playNote(note) {
+      audioManager.playNote(note); // 使用音频管理器播放音符
+    },
+    stopNote(note) {
+      audioManager.stopNote(note); // 使用音频管理器停止音符
+    },
     deleteChord(index) {
       this.chordSequence.splice(index, 1); // 删除指定索引的和弦
     },
@@ -147,7 +160,7 @@ export default {
           }
         });
       }
-
+      console.log('keys', keys);
       return keys;
     },
     onMIDISuccess(midiAccess) {
@@ -162,10 +175,11 @@ export default {
     },
     handleMIDIMessage(event) {
       const [command, note, velocity] = event.data;
-      if (command === 144) { // Note on
+      console.log('handle', command, note, velocity);
+      if (command === 144 && velocity !== 0) { // Note on
         this.renderKey(note, velocity);
         this.addNoteToActive(note);
-      } else if (command === 128) { // Note off
+      } else if (command === 144) { // Note off
         this.renderKey(note, 0);
         this.removeNoteFromActive(note);
       }
@@ -197,6 +211,8 @@ export default {
     addNoteToActive(note) {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
+        console.log('midi', noteName)
+        this.playNote(noteName);
         this.activeNotes.push(noteName);
         if (this.activeNotes.length >= 3) {
           this.recognizeChord();
@@ -207,11 +223,11 @@ export default {
       const noteName = this.midiToNoteName(note);
       const index = this.activeNotes.indexOf(noteName);
       if (index !== -1) {
+        this.stopNote(noteName);
         this.activeNotes.splice(index, 1);
         if (this.activeNotes.length < 3) {
           // 当音符数量少于3时，不更新 recognizedChord，保持当前的 maxChord
           this.onOff = true;
-          console.log('fasdfasdfa')
           return;
         }
         this.recognizeChord();
@@ -368,8 +384,8 @@ export default {
 
 .chord-sequence-popup {
   position: fixed;
-  width: 300px;
-  height: 200px;
+  width: 200px;
+  height: 400px;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -377,7 +393,7 @@ export default {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   cursor: move;
   overflow: auto;
-  top: 50px;
+  top: 70%;
   right: 20px;
   z-index: 9;
   opacity: 0.9;
