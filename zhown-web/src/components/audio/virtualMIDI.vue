@@ -15,15 +15,21 @@
 
     <!-- 操作按钮 -->
     <div class="control-buttons">
-      <el-button type="warning" @click="clearChordSequence" plain round>清除和弦</el-button>
-      <el-button type="info" @click="togglePopup" plain round>{{ showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘' }}</el-button>
+      <el-button size="small" type="warning" @click="clearChordSequence" plain round>清除和弦</el-button>
+      <el-button size="small" type="info" @click="togglePopup" plain round>{{
+          showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘'
+        }}
+      </el-button>
     </div>
 
     <!-- 和弦序列弹窗 -->
     <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
       <span style="color: #505050">和弦序列</span>
       <ul style="color: #8a8a8a">
-        <li v-for="(chord, index) in chordSequence" :key="index">{{ chord }}</li>
+        <li v-for="(chord, index) in chordSequence" :key="index" class="chord-item">
+          {{ chord }}
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteChord(index)"></el-button>
+        </li>
       </ul>
     </div>
   </div>
@@ -97,6 +103,9 @@ export default {
     }
   },
   methods: {
+    deleteChord(index) {
+      this.chordSequence.splice(index, 1); // 删除指定索引的和弦
+    },
     // 方法用于将 MIDI 数字转换为音符名称
     midiToNoteName(midi) {
       const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -396,5 +405,13 @@ export default {
   display: flex;
   justify-content: center;
   gap: 10px;
+}
+
+.chord-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
 }
 </style>
