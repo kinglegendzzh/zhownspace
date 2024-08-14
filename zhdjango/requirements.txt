@@ -1,0 +1,7 @@
+musiclang_predict
+django
+symusic==0.4.7
+scipy
+requests
+musicpy
+numpy
