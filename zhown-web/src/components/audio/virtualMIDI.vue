@@ -2,7 +2,7 @@
   <div class="piano">
     <el-main>
       <div class="chord-display">
-        <h2>你的和弦: <span v-if="recognizedChord">{{recognizedChord}}</span></h2>
+        <h2>你的和弦: <span v-if="recognizedChord">{{ recognizedChord }}</span></h2>
       </div>
     </el-main>
     <div class="piano">
@@ -45,8 +45,11 @@ export default {
         // 添加更多键位映射到你需要的音符
       },
       keys: [],
+      onOff: false,
       activeNotes: [], // 用于存储按下的音符
-      recognizedChord: '' // 识别到的和弦
+      recognizedChord: '', // 识别到的和弦
+      maxChord: '', // 音符最多时的和弦
+      maxNotesCount: 0, // 记录最多音符时的数量
     };
   },
   mounted() {
@@ -167,7 +170,9 @@ export default {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
         this.activeNotes.push(noteName);
-        this.recognizeChord();
+        if (this.activeNotes.length >= 3) {
+          this.recognizeChord();
+        }
       }
     },
     removeNoteFromActive(note) {
@@ -175,24 +180,63 @@ export default {
       const index = this.activeNotes.indexOf(noteName);
       if (index !== -1) {
         this.activeNotes.splice(index, 1);
+        if (this.activeNotes.length < 3) {
+          // 当音符数量少于3时，不更新 recognizedChord，保持当前的 maxChord
+          this.onOff = true;
+          console.log('fasdfasdfa')
+          return;
+        }
         this.recognizeChord();
       }
     },
     async recognizeChord() {
-      if (this.activeNotes.length >= 3) { // 检测三个及以上的音符时才调用接口
+      console.log('act and pre', this.activeNotes, this.preNotes)
+      if (this.activeNotes.length >= 3) {
         try {
+          // 将 activeNotes 转换为 MIDI 值并排序
+          const sortedNotes = this.activeNotes
+              .map(note => ({
+                name: note,
+                midi: this.noteNameToMidi(note)
+              }))
+              .sort((a, b) => a.midi - b.midi)
+              .map(noteObj => noteObj.name);
+
           const response = await Api.post('/chord/recognize/', {
-            notes: this.activeNotes
+            notes: sortedNotes // 传递排序后的音符列表
           });
-          console.log('response.data', response.data)
-          this.recognizedChord = response.data.chord_name;
+
+          const chordName = response.data.chord_name;
+
+          if (this.activeNotes.length >= this.maxNotesCount || this.onOff) {
+            this.onOff = false;
+            this.maxNotesCount = this.activeNotes.length;
+            this.maxChord = chordName;
+            this.recognizedChord = chordName; // 更新和弦显示
+          }
+
         } catch (error) {
           console.error('Chord recognition failed', error);
         }
-      } else {
-        // this.recognizedChord = ''; // 如果音符少于三个，则清空识别结果
       }
     },
+    noteNameToMidi(note) {
+      const notes = {
+        'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+        'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+      };
+      const noteName = note.slice(0, -1); // 提取音符部分（如 "C#"）
+      const octave = parseInt(note.slice(-1)); // 提取八度部分
+      return (octave + 1) * 12 + notes[noteName];
+    },
+    arraysEqual(arr1, arr2) {
+      if (arr1.length !== arr2.length) return false;
+
+      const sortedArr1 = arr1.slice().sort();
+      const sortedArr2 = arr2.slice().sort();
+
+      return sortedArr1.every((value, index) => value === sortedArr2[index]);
+    }
   }
 }
 </script>
