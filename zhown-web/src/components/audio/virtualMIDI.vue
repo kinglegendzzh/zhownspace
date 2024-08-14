@@ -12,10 +12,17 @@
         <div v-if="note.label" class="key-label">{{ note.label }}</div>
       </div>
     </div>
+
+    <!-- 操作按钮 -->
+    <div class="control-buttons">
+      <el-button type="warning" @click="clearChordSequence" plain round>清除和弦</el-button>
+      <el-button type="info" @click="togglePopup" plain round>{{ showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘' }}</el-button>
+    </div>
+
     <!-- 和弦序列弹窗 -->
-    <div class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
-      <h3>和弦序列</h3>
-      <ul>
+    <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
+      <span style="color: #505050">和弦序列</span>
+      <ul style="color: #8a8a8a">
         <li v-for="(chord, index) in chordSequence" :key="index">{{ chord }}</li>
       </ul>
     </div>
@@ -61,6 +68,7 @@ export default {
       isDragging: false, // 用于控制拖动的标识
       dragOffsetX: 0,
       dragOffsetY: 0,
+      showPopup: true, // 控制弹窗显示/隐藏的标识
     };
   },
   mounted() {
@@ -274,6 +282,12 @@ export default {
       document.removeEventListener('mousemove', this.drag);
       document.removeEventListener('mouseup', this.stopDrag);
     },
+    clearChordSequence() {
+      this.chordSequence = []; // 清空和弦序列
+    },
+    togglePopup() {
+      this.showPopup = !this.showPopup; // 切换弹窗的显示/隐藏状态
+    },
   }
 }
 </script>
@@ -375,5 +389,12 @@ export default {
 .chord-sequence-popup li {
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
+}
+
+.control-buttons {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 </style>
