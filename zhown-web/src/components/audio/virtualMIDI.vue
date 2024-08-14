@@ -45,6 +45,7 @@ export default {
       keys: [],
       onOff: false,
       activeNotes: [], // 用于存储按下的音符
+      preNotes: [], // 用于存储按下的音符
       recognizedChord: '', // 识别到的和弦
       maxChord: '', // 音符最多时的和弦
       maxNotesCount: 0, // 记录最多音符时的数量
@@ -188,7 +189,7 @@ export default {
       }
     },
     async recognizeChord() {
-      console.log('act and pre', this.activeNotes, this.preNotes)
+      console.log('act and pre', this.activeNotes)
       if (this.activeNotes.length >= 3) {
         try {
           // 将 activeNotes 转换为 MIDI 值并排序
@@ -199,18 +200,16 @@ export default {
               }))
               .sort((a, b) => a.midi - b.midi)
               .map(noteObj => noteObj.name);
-
-          const response = await Api.post('/chord/recognize/', {
-            notes: sortedNotes // 传递排序后的音符列表
-          });
-
-          const chordName = response.data.chord_name;
-
           if (this.activeNotes.length >= this.maxNotesCount || this.onOff) {
-            this.onOff = false;
-            this.maxNotesCount = this.activeNotes.length;
+            console.log('this.preNotes, this.activeNotes', this.preNotes, this.activeNotes)
+            const response = await Api.post('/chord/recognize/', {
+              notes: sortedNotes // 传递排序后的音符列表
+            });
+            const chordName = response.data.chord_name;
             this.maxChord = chordName;
             this.recognizedChord = chordName; // 更新和弦显示
+            this.onOff = false;
+            this.maxNotesCount = this.activeNotes.length;
           }
 
         } catch (error) {
