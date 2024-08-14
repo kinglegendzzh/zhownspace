@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import path
+from .view.ChordRecognitionView import ChordRecognitionView
 from .view.UpAudio import upAudio,getAudioStream
 from .view.login import httpTest,jsonTest
 
@@ -25,4 +26,5 @@ urlpatterns = [
     path('zhown/get/', getAudioStream, name='upload_audio_get'),
     path('zhown/httpTest/', httpTest, name='httpTest'),
     path('zhown/jsonTest/', jsonTest, name='jsonTest'),
+    path('zhown/chord/recognize/', ChordRecognitionView.as_view(), name='recognize-chord'),
 ]
