@@ -1,6 +1,6 @@
 import unittest
 
-from zhdjango.task.chords.numpyMarkov import ChordPredictor
+from zhdjango.task.chords.prediction.numpyMarkov import ChordPredictor
 
 
 class MyTestCase(unittest.TestCase):
