@@ -1,7 +1,7 @@
 <template>
   <div class="piano-">
     <div class="chord-display">
-      <h2>你的和弦: <span v-if="recognizedChord">{{ recognizedChord }}</span></h2>
+      <h2>当前和弦: <span v-if="recognizedChord">{{ recognizedChord }}</span></h2>
     </div>
     <div class="piano">
       <div v-for="(note) in keys"
@@ -11,6 +11,13 @@
            :ref="'key-' + note.midi">
         <div v-if="note.label" class="key-label">{{ note.label }}</div>
       </div>
+    </div>
+    <!-- 和弦序列弹窗 -->
+    <div class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
+      <h3>和弦序列</h3>
+      <ul>
+        <li v-for="(chord, index) in chordSequence" :key="index">{{ chord }}</li>
+      </ul>
     </div>
   </div>
 </template>
@@ -49,6 +56,11 @@ export default {
       recognizedChord: '', // 识别到的和弦
       maxChord: '', // 音符最多时的和弦
       maxNotesCount: 0, // 记录最多音符时的数量
+
+      chordSequence: [], // 用于存储和弦序列的数组
+      isDragging: false, // 用于控制拖动的标识
+      dragOffsetX: 0,
+      dragOffsetY: 0,
     };
   },
   mounted() {
@@ -211,7 +223,9 @@ export default {
             this.onOff = false;
             this.maxNotesCount = this.activeNotes.length;
           }
-
+          if (this.recognizedChord) {
+            this.addChordToSequence(this.recognizedChord);
+          }
         } catch (error) {
           console.error('Chord recognition failed', error);
         }
@@ -233,7 +247,33 @@ export default {
       const sortedArr2 = arr2.slice().sort();
 
       return sortedArr1.every((value, index) => value === sortedArr2[index]);
-    }
+    },
+    addChordToSequence(chord) {
+      if (this.chordSequence.length >= 10) {
+        this.chordSequence.shift(); // 删除第一个元素
+      }
+      this.chordSequence.push(chord); // 添加新和弦到序列
+    },
+    startDrag(event) {
+      this.isDragging = true;
+      const popup = this.$refs.popup;
+      this.dragOffsetX = event.clientX - popup.getBoundingClientRect().left;
+      this.dragOffsetY = event.clientY - popup.getBoundingClientRect().top;
+      document.addEventListener('mousemove', this.drag);
+      document.addEventListener('mouseup', this.stopDrag);
+    },
+    drag(event) {
+      if (this.isDragging) {
+        const popup = this.$refs.popup;
+        popup.style.left = `${event.clientX - this.dragOffsetX}px`;
+        popup.style.top = `${event.clientY - this.dragOffsetY}px`;
+      }
+    },
+    stopDrag() {
+      this.isDragging = false;
+      document.removeEventListener('mousemove', this.drag);
+      document.removeEventListener('mouseup', this.stopDrag);
+    },
   }
 }
 </script>
@@ -301,5 +341,39 @@ export default {
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
+}
+
+.chord-sequence-popup {
+  position: fixed;
+  width: 300px;
+  height: 200px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  cursor: move;
+  overflow: auto;
+  top: 50px;
+  right: 20px;
+  z-index: 9;
+  opacity: 0.9;
+}
+
+.chord-sequence-popup h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.chord-sequence-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chord-sequence-popup li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
 }
 </style>
