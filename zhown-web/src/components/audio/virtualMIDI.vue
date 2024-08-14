@@ -1,10 +1,8 @@
 <template>
-  <div class="piano">
-    <el-main>
-      <div class="chord-display">
-        <h2>你的和弦: <span v-if="recognizedChord">{{ recognizedChord }}</span></h2>
-      </div>
-    </el-main>
+  <div class="piano-">
+    <div class="chord-display">
+      <h2>你的和弦: <span v-if="recognizedChord">{{ recognizedChord }}</span></h2>
+    </div>
     <div class="piano">
       <div v-for="(note) in keys"
            :key="note.midi"
@@ -259,6 +257,9 @@ export default {
   height: 150px;
   background: white;
   z-index: 1;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* 添加阴影效果 */
 }
 
 .black-key {
@@ -266,10 +267,13 @@ export default {
   height: 100px;
   background: black;
   position: relative;
-  top: -80px;
+  top: -52px;
+  border-radius: 3px;
+  border: none;
   margin-left: -15px;
   margin-right: -15px;
   z-index: 2;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* 添加阴影效果 */
 }
 
 .piano-key.active {
@@ -288,6 +292,10 @@ export default {
 
 .white-key .key-label {
   color: black;
+}
+
+.piano- {
+  display: block;
 }
 
 .chord-display {
