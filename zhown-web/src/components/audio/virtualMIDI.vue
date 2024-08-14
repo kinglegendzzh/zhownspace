@@ -90,6 +90,9 @@ export default {
       dragOffsetY: 0,
       showPopup: true, // 控制弹窗显示/隐藏的标识
       showToneLibrary: false, // 控制音色库窗口显示/隐藏的标识
+
+      sustainPedal: false, // 用于跟踪踏板状态
+      sustainedNotes: [], // 用于跟踪正在延音的音符
     };
   },
   mounted() {
@@ -187,12 +190,20 @@ export default {
     handleMIDIMessage(event) {
       const [command, note, velocity] = event.data;
       console.log('handle', command, note, velocity);
+
       if (command === 144 && velocity !== 0) { // Note on
         this.renderKey(note, velocity);
         this.addNoteToActive(note);
       } else if (command === 144) { // Note off
         this.renderKey(note, 0);
         this.removeNoteFromActive(note);
+      } else if (command === 176 && note === 64) { // Handle sustain pedal
+        if (velocity === 127) {
+          this.sustainPedal = true; // 踏板按下
+        } else if (velocity === 0) {
+          this.sustainPedal = false; // 踏板释放
+          this.releaseSustainedNotes();
+        }
       }
     },
     handleKeyDown(event) {
@@ -233,9 +244,17 @@ export default {
     removeNoteFromActive(note) {
       const noteName = this.midiToNoteName(note);
       const index = this.activeNotes.indexOf(noteName);
+
       if (index !== -1) {
-        this.stopNote(noteName);
         this.activeNotes.splice(index, 1);
+
+        if (this.sustainPedal) {
+          // 如果踏板按下，将音符添加到延音列表中
+          this.sustainedNotes.push(noteName);
+        } else {
+          // 如果踏板未按下，立即停止音符
+          this.stopNote(noteName);
+        }
 
         if (this.activeNotes.length === 0) {
           // 当前活跃按下音符为0，且上次音符数 >= 3，才记录新和弦
@@ -253,6 +272,12 @@ export default {
           return;
         }
         this.recognizeChord();
+      }
+    },
+    releaseSustainedNotes() {
+      while (this.sustainedNotes.length > 0) {
+        const note = this.sustainedNotes.pop();
+        this.stopNote(note);
       }
     },
     async recognizeChord() {
