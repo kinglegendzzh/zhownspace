@@ -17,12 +17,12 @@
 
     <!-- 操作按钮 -->
     <div class="control-buttons">
-      <el-button size="small" type="warning" @click="clearChordSequence" plain round>清除和弦</el-button>
-      <el-button size="small" type="info" @click="togglePopup" plain round>{{
+      <el-button size="small" type="warning" @click="clearChordSequence" plain>清除和弦</el-button>
+      <el-button size="small" type="info" @click="togglePopup" plain>{{
           showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘'
         }}
       </el-button>
-      <el-button size="small" type="primary" @click="toggleToneLibrary" plain round>切换音色库</el-button>
+      <el-button size="small" type="primary" @click="toggleToneLibrary" plain>切换音色库</el-button>
     </div>
 
     <!-- 音色库窗口 -->
@@ -71,9 +71,11 @@ export default {
         'U': 58, // A#2
         'J': 59, // B2
         'K': 60,  // C3
-        'O': 61,
-        'L': 62,
-        'P': 63,
+        'O': 61,  //C#3
+        'L': 62,  //D3
+        'P': 63,  //D#3
+        ';': 64,  //E3
+        '\'': 65,  //F3
         // 添加更多键位映射到你需要的音符
       },
       keys: [],
@@ -122,7 +124,7 @@ export default {
   },
   methods: {
     audioManager() {
-      return audioManager
+      return audioManager;
     },
     playNote(note) {
       audioManager.playNote(note); // 使用音频管理器播放音符
@@ -133,7 +135,6 @@ export default {
     deleteChord(index) {
       this.chordSequence.splice(index, 1); // 删除指定索引的和弦
     },
-    // 方法用于将 MIDI 数字转换为音符名称
     midiToNoteName(midi) {
       const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
       const octave = Math.floor(midi / 12) - 1;
@@ -165,7 +166,6 @@ export default {
               midi,
               ...note
             };
-            // 查找是否有映射的字母
             const label = Object.keys(this.keyMapping).find(key => this.keyMapping[key] === midi);
             if (label) {
               key.label = label;
@@ -233,7 +233,7 @@ export default {
     addNoteToActive(note) {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
-        console.log('midi', noteName)
+        console.log('midi', noteName);
         this.playNote(noteName);
         this.activeNotes.push(noteName);
         if (this.activeNotes.length >= 3) {
@@ -249,25 +249,20 @@ export default {
         this.activeNotes.splice(index, 1);
 
         if (this.sustainPedal) {
-          // 如果踏板按下，将音符添加到延音列表中
           this.sustainedNotes.push(noteName);
         } else {
-          // 如果踏板未按下，立即停止音符
           this.stopNote(noteName);
         }
 
         if (this.activeNotes.length === 0) {
-          // 当前活跃按下音符为0，且上次音符数 >= 3，才记录新和弦
           if (this.maxNotesCount >= 3) {
             this.addChordToSequence(this.maxChord);
           }
-          // 重置最大音符计数器
           this.maxNotesCount = 0;
           this.maxChord = '';
         }
 
         if (this.activeNotes.length < 3) {
-          // 当音符数量少于3时，不更新 recognizedChord，保持当前的 maxChord
           this.onOff = true;
           return;
         }
@@ -281,10 +276,8 @@ export default {
       }
     },
     async recognizeChord() {
-      console.log('act and pre', this.activeNotes)
       if (this.activeNotes.length >= 3) {
         try {
-          // 将 activeNotes 转换为 MIDI 值并排序
           const sortedNotes = this.activeNotes
               .map(note => ({
                 name: note,
@@ -293,29 +286,39 @@ export default {
               .sort((a, b) => a.midi - b.midi)
               .map(noteObj => noteObj.name);
 
-          // 只在当前音符数大于等于上次记录的最大音符数时更新和弦
-          if (this.activeNotes.length >= this.maxNotesCount || this.onOff) {
-            const response = await Api.post('/chord/recognize/', {
-              notes: sortedNotes // 传递排序后的音符列表
-            });
-            const chordName = response.data.chord_name;
-            this.maxChord = chordName;
-            this.recognizedChord = chordName; // 更新和弦显示
-            this.onOff = false;
-            this.maxNotesCount = this.activeNotes.length;
+          const chordKey = this.hashChord(sortedNotes);
+
+          let chordName = localStorage.getItem(chordKey);
+          if (!chordName) {
+            if (this.activeNotes.length >= this.maxNotesCount || this.onOff) {
+              const response = await Api.post('/chord/recognize/', {
+                notes: sortedNotes
+              });
+              chordName = response.data.chord_name;
+              localStorage.setItem(chordKey, chordName);
+            }
           }
+
+          this.maxChord = chordName;
+          this.recognizedChord = chordName;
+          this.onOff = false;
+          this.maxNotesCount = this.activeNotes.length;
+
         } catch (error) {
           console.error('Chord recognition failed', error);
         }
       }
+    },
+    hashChord(notes) {
+      return notes.join('-');
     },
     noteNameToMidi(note) {
       const notes = {
         'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
         'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
       };
-      const noteName = note.slice(0, -1); // 提取音符部分（如 "C#"）
-      const octave = parseInt(note.slice(-1)); // 提取八度部分
+      const noteName = note.slice(0, -1);
+      const octave = parseInt(note.slice(-1));
       return (octave + 1) * 12 + notes[noteName];
     },
     arraysEqual(arr1, arr2) {
@@ -328,9 +331,9 @@ export default {
     },
     addChordToSequence(chord) {
       if (this.chordSequence.length >= 10) {
-        this.chordSequence.shift(); // 删除第一个元素
+        this.chordSequence.shift();
       }
-      this.chordSequence.push(chord); // 添加新和弦到序列
+      this.chordSequence.push(chord);
     },
     startDrag(event) {
       this.isDragging = true;
@@ -353,18 +356,18 @@ export default {
       document.removeEventListener('mouseup', this.stopDrag);
     },
     clearChordSequence() {
-      this.chordSequence = []; // 清空和弦序列
+      this.chordSequence = [];
     },
     togglePopup() {
-      this.showPopup = !this.showPopup; // 切换弹窗的显示/隐藏状态
+      this.showPopup = !this.showPopup;
     },
     toggleToneLibrary() {
-      this.showToneLibrary = !this.showToneLibrary; // 切换音色库窗口的显示/隐藏状态
+      this.showToneLibrary = !this.showToneLibrary;
     },
     selectTone(toneName) {
       audioManager.url = audioManager.tones[toneName];
       audioManager.setupAudio(audioManager.url);
-      this.showToneLibrary = false; // 选择音色后隐藏音色库窗口
+      this.showToneLibrary = false;
     },
     startToneDrag(event) {
       this.isDragging = true;
@@ -375,6 +378,7 @@ export default {
       document.addEventListener('mouseup', this.stopDrag);
     },
   }
+
 }
 </script>
 
