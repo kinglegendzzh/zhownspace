@@ -106,7 +106,7 @@ export default {
   background: rgba(0, 0, 0, 0.5);
   position: absolute;
   bottom: 0;
-  width: 90%;
+  width: 100%;
 }
 
 .controls {

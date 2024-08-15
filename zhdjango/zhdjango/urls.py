@@ -15,10 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.urls import path
-from .view.ChordRecognitionView import ChordRecognitionView
-from .view.UpAudio import upAudio,getAudioStream
-from .view.login import httpTest,jsonTest
+from .view.chordRecognitionView import ChordRecognitionView
+from .view.detail import article_detail
+from .view.upAudio import upAudio, getAudioStream
+from .view.login import httpTest, jsonTest
+from .view.detail import (
+    create_article, delete_article, update_article, get_article,
+    create_comment, delete_comment, update_comment, get_comments,
+    list_articles,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +32,14 @@ urlpatterns = [
     path('zhown/httpTest/', httpTest, name='httpTest'),
     path('zhown/jsonTest/', jsonTest, name='jsonTest'),
     path('zhown/chord/recognize/', ChordRecognitionView.as_view(), name='recognize-chord'),
+    path('api/article/<int:pk>/', article_detail, name='article-detail'),
+    path('api/article/', create_article, name='create-article'),
+    path('api/article/<int:article_id>/', get_article, name='get-article'),
+    path('api/article/<int:article_id>/update/', update_article, name='update-article'),
+    path('api/article/<int:article_id>/delete/', delete_article, name='delete-article'),
+    path('api/article/<int:article_id>/comments/', get_comments, name='get-comments'),
+    path('api/article/<int:article_id>/comments/create/', create_comment, name='create-comment'),
+    path('api/comment/<int:comment_id>/delete/', delete_comment, name='delete-comment'),
+    path('api/comment/<int:comment_id>/update/', update_comment, name='update-comment'),
+    path('api/articles/', list_articles, name='list-articles'),
 ]
