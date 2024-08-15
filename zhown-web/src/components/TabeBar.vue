@@ -62,7 +62,24 @@ export default {
       ],
     };
   },
+  mounted() {
+    const currentRouteName = this.getTopLevelRouteName();
+    console.log('rname', currentRouteName);
+    const selectedTab = this.tabs.find(tab => tab.name === currentRouteName);
+
+    if (selectedTab) {
+      this.activeName = currentRouteName;
+      this.changeTab(selectedTab);
+    }
+  },
   methods: {
+    getTopLevelRouteName() {
+      const path = this.$route.path;  // 获取当前路径
+      const segments = path.split('/');  // 以 '/' 分割路径
+
+      // 返回非空的第一个路径段
+      return segments.find(segment => segment !== '');
+    },
     handleClick(tab) {
       const currentRoute = this.$route.path;
       const targetRoute = `/${tab.name}`;
