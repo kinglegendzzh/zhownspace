@@ -63,6 +63,7 @@ class AudioManager {
         // 设置初始音量和滤波器频率
         this.gainNode.gain.setValueAtTime(0.5, Tone.context.currentTime);
         this.filterNode.frequency.setValueAtTime(1000, Tone.context.currentTime);
+        return true;
     }
 
     playNote(note) {

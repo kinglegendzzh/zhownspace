@@ -29,7 +29,8 @@
     </div>
 
     <!-- 音色库窗口 -->
-    <div v-if="showToneLibrary" class="tone-library-popup" ref="toneLibrary" @mousedown="startToneDrag">
+    <div v-if="showToneLibrary" class="tone-library-popup" ref="toneLibrary"
+         @mousedown="startDrag($event, 'toneLibrary')">
       <span style="color: #c6c6ff">音色库</span>
       <ul style="color: #dfdeff">
         <li v-for="(url, toneName) in audioManager().tones" :key="toneName" @click="selectTone(toneName)">
@@ -39,7 +40,7 @@
     </div>
 
     <!-- 和弦序列弹窗 -->
-    <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
+    <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag($event, 'popup')">
       <span style="color: #c6c6ff">和弦序列</span>
       <ul style="color: #dfdeff">
         <li v-for="(chord, index) in chordSequence" :key="index" class="chord-item">
@@ -346,25 +347,27 @@ export default {
       }
       this.chordSequence.push(chord);
     },
-    startDrag(event) {
+    startDrag(event, elementRef) {
       this.isDragging = true;
-      const popup = this.$refs.popup;
-      this.dragOffsetX = event.clientX - popup.getBoundingClientRect().left;
-      this.dragOffsetY = event.clientY - popup.getBoundingClientRect().top;
+      const element = this.$refs[elementRef];
+      this.dragOffsetX = event.clientX - element.getBoundingClientRect().left;
+      this.dragOffsetY = event.clientY - element.getBoundingClientRect().top;
       document.addEventListener('mousemove', this.drag);
       document.addEventListener('mouseup', this.stopDrag);
+      this.draggingElement = elementRef;
     },
     drag(event) {
       if (this.isDragging) {
-        const popup = this.$refs.popup;
-        popup.style.left = `${event.clientX - this.dragOffsetX}px`;
-        popup.style.top = `${event.clientY - this.dragOffsetY}px`;
+        const element = this.$refs[this.draggingElement];
+        element.style.left = `${event.clientX - this.dragOffsetX}px`;
+        element.style.top = `${event.clientY - this.dragOffsetY}px`;
       }
     },
     stopDrag() {
       this.isDragging = false;
       document.removeEventListener('mousemove', this.drag);
       document.removeEventListener('mouseup', this.stopDrag);
+      this.draggingElement = null;
     },
     clearChordSequence() {
       this.chordSequence = [];
@@ -377,7 +380,9 @@ export default {
     },
     selectTone(toneName) {
       audioManager.url = audioManager.tones[toneName];
-      audioManager.setupAudio(audioManager.url);
+      if (audioManager.setupAudio(audioManager.url)) {
+        this.$message.success('音色已切换至' + toneName);
+      }
       this.showToneLibrary = false;
     },
     startToneDrag(event) {
@@ -471,7 +476,7 @@ export default {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   cursor: move;
   overflow: auto;
-  top: 100px;
+  top: 180px;
   right: 20px;
   z-index: 9;
   opacity: 0.9;
