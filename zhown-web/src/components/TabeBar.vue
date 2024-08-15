@@ -22,7 +22,7 @@ export default {
           name: 'product',
           img: "linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%)",
           textColor: "#180161",
-          desc: "与其说是产品，不如说是代码。",
+          desc: "山无处不在，只是登法不同。",
           label: "章浩的产品"
         },
         {
