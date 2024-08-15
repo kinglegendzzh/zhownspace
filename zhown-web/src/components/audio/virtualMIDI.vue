@@ -30,8 +30,8 @@
 
     <!-- 音色库窗口 -->
     <div v-if="showToneLibrary" class="tone-library-popup" ref="toneLibrary" @mousedown="startToneDrag">
-      <span style="color: #505050">音色库</span>
-      <ul style="color: #8a8a8a">
+      <span style="color: #c6c6ff">音色库</span>
+      <ul style="color: #dfdeff">
         <li v-for="(url, toneName) in audioManager().tones" :key="toneName" @click="selectTone(toneName)">
           {{ toneName }}
         </li>
@@ -40,11 +40,12 @@
 
     <!-- 和弦序列弹窗 -->
     <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag">
-      <span style="color: #505050">和弦序列</span>
-      <ul style="color: #8a8a8a">
+      <span style="color: #c6c6ff">和弦序列</span>
+      <ul style="color: #dfdeff">
         <li v-for="(chord, index) in chordSequence" :key="index" class="chord-item">
           {{ chord }}
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteChord(index)"></el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteChord(index)"
+                     class="delete-button"></el-button>
         </li>
       </ul>
     </div>
@@ -456,8 +457,8 @@ export default {
   position: fixed;
   width: 200px;
   height: 300px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background-color: transparent;
+  border: 1px solid #ededed;
   border-radius: 10px;
   padding: 10px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
@@ -505,7 +506,7 @@ export default {
   position: fixed;
   width: 200px;
   height: 150px;
-  background-color: #f0f0f0;
+  background-color: transparent;
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 10px;
@@ -555,5 +556,27 @@ export default {
 .custom-button:active {
   background-color: white !important;
   color: black !important;
+}
+
+.delete-button {
+  border: 1px solid white !important;
+  background-color: transparent !important;
+  color: #ff7b7b !important;
+  border-radius: 10px !important;
+}
+
+.delete-button:hover {
+  background-color: #ff7b7b !important;
+  color: white !important;
+}
+
+.delete-button:focus {
+  background-color: #ff7b7b !important;
+  color: white !important;
+}
+
+.delete-button:active {
+  background-color: #ff7b7b !important;
+  color: white !important;
 }
 </style>
