@@ -6,7 +6,7 @@
         :label="tab.label"
         :name="tab.name"
     >
-      <router-link :to="`/${tab.name}`"></router-link>
+      <router-view></router-view>
     </el-tab-pane>
   </el-tabs>
 </template>
@@ -18,6 +18,13 @@ export default {
     return {
       activeName: 'product',
       tabs: [
+        {
+          name: 'product',
+          img: "linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%)",
+          textColor: "#180161",
+          desc: "与其说是产品，不如说是代码。",
+          label: "章浩的产品"
+        },
         {
           name: 'page',
           img: "linear-gradient(-225deg, #F9F7F7 0%, #DBE2EF 48%, #3F72AF 100%)",
@@ -46,13 +53,6 @@ export default {
           label: "章浩的艺术画廊"
         },
         {
-          name: 'product',
-          img: "linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%)",
-          textColor: "#180161",
-          desc: "与其说是产品，不如说是代码。",
-          label: "章浩的产品"
-        },
-        {
           name: 'five',
           img: "linear-gradient(-225deg, #B83B5E 0%, #F08A5D 48%, #F9ED69 100%)",
           textColor: "#6A2C70",
@@ -63,22 +63,29 @@ export default {
     };
   },
   methods: {
-    handleClick(tab, event) {
-      console.log(tab, event);
+    handleClick(tab) {
+      const currentRoute = this.$route.path;
+      const targetRoute = `/${tab.name}`;
+
+      // 仅在目标路径不同于当前路径时进行导航
+      if (currentRoute !== targetRoute) {
+        this.$router.push(targetRoute);
+      }
+
       const selectedTab = this.tabs.find(t => t.name === tab.name);
       this.changeTab(selectedTab);
     },
     changeTab(tab) {
-      console.log('chage', tab.img)
+      console.log('changeTab', tab);
       this.$emit('change-background', {
         background: tab.img,
         textColor: tab.textColor,
         desc: tab.desc,
         label: tab.label
       });
-    }
-  }
-};
+    },
+  },
+}
 </script>
 
 <style scoped>

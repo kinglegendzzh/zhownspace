@@ -3,7 +3,6 @@ import App from './App.vue'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Router from 'vue-router';
-import TabeBar from '@/components/TabeBar.vue'; // 顶部标签页组件
 import ProductPage from '@/components/pages/ProductPage.vue';
 import ArticlePage from '@/components/pages/ArticlePage.vue';
 import CodeLabPage from '@/components/pages/CodeLabPage.vue';
@@ -170,18 +169,13 @@ Vue.use(Router);
 
 const router = new Router({
     routes: [
-        {
-            path: '/',
-            component: TabeBar,
-            children: [
-                {path: 'product', component: ProductPage},
-                {path: 'page', component: ArticlePage},
-                {path: 'code', component: CodeLabPage},
-                {path: 'second', component: MusicPage},
-                {path: 'third', component: GalleryPage},
-                {path: 'five', component: AboutPage}
-            ]
-        }
+        {path: '/product', component: ProductPage},
+        {path: '/page', component: ArticlePage},
+        {path: '/code', component: CodeLabPage},
+        {path: '/second', component: MusicPage},
+        {path: '/third', component: GalleryPage},
+        {path: '/five', component: AboutPage},
+        {path: '/', redirect: '/product'} // 默认重定向到 /product
     ]
 });
 

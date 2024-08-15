@@ -6,6 +6,12 @@
 </template>
 <script>
 export default {
-  name: "ProductPage"
+  name: "ProductPage",
+  data() {
+    return {};
+  },
+  created() {
+  },
+  methods: {},
 };
 </script>
