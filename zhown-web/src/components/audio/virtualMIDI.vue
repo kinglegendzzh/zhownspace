@@ -79,6 +79,7 @@ export default {
         'L': 62,  //D3
         'P': 63,  //D#3
         ';': 64,  //E3
+        '；': 64,  //E3
         '\'': 65,  //F3
         // 添加更多键位映射到你需要的音符
       },
@@ -237,10 +238,17 @@ export default {
     addNoteToActive(note) {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
-        console.log('midi', noteName);
         this.playNote(noteName);
         this.activeNotes.push(noteName);
+
+        if (this.activeNotes.length === 3) {
+          // 当音符数达到3个时，开启记录模式，清空之前的最大音符记录
+          this.maxNotesCount = 0;
+          this.maxChord = '';
+        }
+
         if (this.activeNotes.length >= 3) {
+          // 记录当前最大音符数及对应和弦
           this.recognizeChord();
         }
       }
@@ -258,19 +266,17 @@ export default {
           this.stopNote(noteName);
         }
 
-        if (this.activeNotes.length === 0) {
+        if (this.activeNotes.length < 3 && this.activeNotes.length > 0) {
+          // 当音符少于3个但仍有音符按下时，不再更新和弦
+          this.onOff = true;
+        } else if (this.activeNotes.length === 0) {
+          // 当所有音符释放后，录入和弦并关闭记录模式
           if (this.maxNotesCount >= 3) {
             this.addChordToSequence(this.maxChord);
           }
           this.maxNotesCount = 0;
           this.maxChord = '';
         }
-
-        if (this.activeNotes.length < 3) {
-          this.onOff = true;
-          return;
-        }
-        this.recognizeChord();
       }
     },
     releaseSustainedNotes() {
@@ -294,20 +300,21 @@ export default {
 
           let chordName = localStorage.getItem(chordKey);
           if (!chordName) {
-            if (this.activeNotes.length >= this.maxNotesCount || this.onOff) {
-              const response = await Api.post('/chord/recognize/', {
-                notes: sortedNotes
-              });
-              chordName = response.data.chord_name;
-              localStorage.setItem(chordKey, chordName);
-            }
+            const response = await Api.post('/chord/recognize/', {
+              notes: sortedNotes
+            });
+            chordName = response.data.chord_name;
+            localStorage.setItem(chordKey, chordName);
           }
 
-          this.maxChord = chordName;
+          // 更新最大音符数及和弦
+          if (this.activeNotes.length > this.maxNotesCount) {
+            this.maxNotesCount = this.activeNotes.length;
+            this.maxChord = chordName;
+          }
+
           this.recognizedChord = chordName;
           this.onOff = false;
-          this.maxNotesCount = this.activeNotes.length;
-
         } catch (error) {
           console.error('Chord recognition failed', error);
         }
