@@ -17,12 +17,15 @@
 
     <!-- 操作按钮 -->
     <div class="control-buttons">
-      <el-button size="small" type="warning" @click="clearChordSequence" plain>清除和弦</el-button>
-      <el-button size="small" type="info" @click="togglePopup" plain>{{
-          showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘'
-        }}
+      <el-button size="small" type="warning" @click="clearChordSequence" plain round class="custom-button">
+        清除和弦
       </el-button>
-      <el-button size="small" type="primary" @click="toggleToneLibrary" plain>切换音色库</el-button>
+      <el-button size="small" type="info" @click="togglePopup" plain round class="custom-button">
+        {{ showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘' }}
+      </el-button>
+      <el-button size="small" type="primary" @click="toggleToneLibrary" plain round class="custom-button">
+        切换音色库
+      </el-button>
     </div>
 
     <!-- 音色库窗口 -->
@@ -431,10 +434,12 @@ export default {
   font-size: 14px;
   color: white;
   z-index: 3;
+  user-select: none; /* 禁止文本选择 */
 }
 
 .white-key .key-label {
   color: black;
+  user-select: none; /* 禁止文本选择 */
 }
 
 .piano- {
@@ -527,5 +532,28 @@ export default {
 
 .tone-library-popup li:hover {
   background-color: #e0e0e0;
+}
+
+/* 添加自定义按钮样式 */
+.custom-button {
+  border: 1px solid white;
+  background-color: transparent !important;
+  color: white !important;
+  border-radius: 10px !important;
+}
+
+.custom-button:hover {
+  background-color: white !important;
+  color: black !important;
+}
+
+.custom-button:focus {
+  background-color: white !important;
+  color: black !important;
+}
+
+.custom-button:active {
+  background-color: white !important;
+  color: black !important;
 }
 </style>
