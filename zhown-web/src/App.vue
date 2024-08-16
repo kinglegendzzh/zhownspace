@@ -1,28 +1,37 @@
 <template>
   <el-container class="app-container" :style="{color: textColor, backgroundImage: backImg}">
     <el-header class="app-header">
+      <el-switch
+          style="position: absolute; top: 10px; right: 10px;"
+          v-model="switchValue"
+          active-color="#13ce66"
+          inactive-color="#ff4949"
+          active-text="在线模式"
+          inactive-text="离线模式">
+      </el-switch>
       <h1 class="animated-title" :style="{color: textColor}">{{ firstTitle.displayText }}
-      <span v-if="firstTitle.showCaret" class="caret"></span>
+        <span v-if="firstTitle.showCaret" class="caret"></span>
       </h1>
     </el-header>
     <el-main class="main">
       <div class="animated-title-custom">
         <span
-          v-for="(char, index) in secTitle.characters"
-          :key="index"
-          :style="getStyle(index)"
-          class="char-span"
-          >{{ char }}</span>
+            v-for="(char, index) in secTitle.characters"
+            :key="index"
+            :style="getStyle(index)"
+            class="char-span"
+        >{{ char }}</span>
       </div>
       <tabe-bar @change-background="updateBackgroundImg"/>
       <el-footer>
-    </el-footer>
+      </el-footer>
     </el-main>
-</el-container>
+  </el-container>
 </template>
 
 <script>
 import TabeBar from "@/components/TabeBar.vue";
+
 export default {
   name: "App",
   components: {
@@ -30,6 +39,7 @@ export default {
   },
   data() {
     return {
+      switchValue: false,
       backImg: 'linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%)',
       textColor: '#180161',
       firstTitle: {
@@ -168,5 +178,9 @@ export default {
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateX(-20px);
+}
+
+::v-deep .el-switch__label {
+  color: v-bind(textColor); /* 动态设置字体颜色 */
 }
 </style>

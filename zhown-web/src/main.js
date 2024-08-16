@@ -175,6 +175,8 @@ const router = new Router({
         {path: '/second', component: MusicPage},
         {path: '/third', component: GalleryPage},
         {path: '/five', component: AboutPage},
+        {path: '/zhownmusic', component: AboutPage},
+        {path: '/chordprediction', component: AboutPage},
         {path: '/', redirect: '/product'} // 默认重定向到 /product
     ]
 });
