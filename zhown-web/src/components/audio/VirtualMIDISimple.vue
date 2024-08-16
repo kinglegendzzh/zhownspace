@@ -1,6 +1,5 @@
 <template>
   <div class="piano-">
-    <current-chord-display :recognizedChord="recognizedChord"/>
     <div class="piano">
       <div v-for="(note) in keys"
            :key="note.midi"
@@ -12,50 +11,14 @@
         <div v-if="note.label" class="key-label">{{ note.label }}</div>
       </div>
     </div>
-
-    <!-- 操作按钮 -->
-    <div class="control-buttons">
-      <clear-chord-button @clear-chord-sequence="clearChordSequence"/>
-      <el-button size="small" type="info" @click="togglePopup" plain round class="custom-button">
-        {{ showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘' }}
-      </el-button>
-      <el-button size="small" type="primary" @click="toggleToneLibrary" plain round class="custom-button">
-        切换音色库
-      </el-button>
-    </div>
-
-    <!-- 和弦序列弹窗 -->
-    <chord-sequence-popup
-        :chordSequence="chordSequence"
-        :showPopup="showPopup"
-        ref="popup"
-        @delete-chord="deleteChord"
-        @start-drag="startDrag($event, 'popup')"
-    />
-
-    <!-- 音色库窗口 -->
-    <tone-library-popup
-        :tones="audioManager().tones"
-        :showToneLibrary="showToneLibrary"
-        @select-tone="selectTone"
-        @start-drag="startDrag($event, 'toneLibrary')"
-    />
   </div>
 </template>
 <script>
 import Api from "@/utils/api";
 import audioManager from "@/utils/audioManager";
-import CurrentChordDisplay from '@/components/audio/CurrentChordDisplay.vue';
-import ChordSequencePopup from '@/components/audio/ChordSequencePopup.vue';
-import ToneLibraryPopup from '@/components/audio/ToneLibraryPopup.vue';
-import ClearChordButton from "@/components/audio/ClearChordButton.vue";
 
 export default {
   components: {
-    ClearChordButton,
-    ToneLibraryPopup,
-    CurrentChordDisplay,
-    ChordSequencePopup,
   },
   data() {
     return {
