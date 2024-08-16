@@ -441,14 +441,20 @@ export default {
 
 <style scoped>
 .piano {
-  display: flex;
-  justify-content: center;
+  display: inline-flex; /* 使琴键容器根据内容大小调整 */
+  justify-content: center; /* 居中对齐 */
   align-items: flex-end;
+  overflow-x: auto; /* 使容器可以水平滚动 */
+  white-space: nowrap; /* 避免子元素换行 */
+  -webkit-overflow-scrolling: touch; /* 为移动设备启用惯性滚动 */
+  padding-bottom: 10px; /* 给黑键留出滚动区域 */
+  width: 100%; /* 让容器占满父容器的宽度 */
 }
 
 .piano-key {
   position: relative;
   margin: 0 1px;
+  flex-shrink: 0; /* 阻止键缩小 */
   border: 1px solid black;
 }
 

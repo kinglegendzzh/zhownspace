@@ -1,6 +1,6 @@
 <template>
   <pre>
-    <code v-if="type === 1" :class="`language-${language}`" ref="code">{{ codeSnippet }}</code>
+    <code style="border-radius: 5px;" v-if="type === 1" :class="`language-${language}`" ref="code">{{ codeSnippet }}</code>
     <codemirror v-if="type === 2" v-model="currentCode" :options="cmOptions"></codemirror>
   </pre>
 </template>

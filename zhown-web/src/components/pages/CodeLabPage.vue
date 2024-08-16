@@ -70,7 +70,7 @@
           <emoji-icon emoji-name="whistle"/>
         </div>
         <highlighted-code :codeSnippet="code[0]" :type="1" style="text-align: left;  width: 50%;
-            display: inline-block;"></highlighted-code>
+            display: inline-block; background-color: transparent"></highlighted-code>
         <div class="items">你可以同时敲击字母A、D、G试试看呢～～
         </div>
         <el-divider content-position="center">
@@ -156,6 +156,85 @@ export default {
       sustainedNotes: [], // 用于跟踪正在延音的音符
     };
   },
+    addNoteToActive(note) {
+      const noteName = this.midiToNoteName(note);
+      if (!this.activeNotes.includes(noteName)) {
+        this.playNote(noteName);
+        this.activeNotes.push(noteName);
+
+        if (this.activeNotes.length === 3) {
+          // 当音符数达到3个时，开启记录模式，清空之前的最大音符记录
+          this.maxNotesCount = 0;
+          this.maxChord = '';
+        }
+
+        if (this.activeNotes.length >= 3) {
+          // 记录当前最大音符数及对应和弦
+          this.recognizeChord();
+        }
+      }
+    },
+    removeNoteFromActive(note) {
+      const noteName = this.midiToNoteName(note);
+      const index = this.activeNotes.indexOf(noteName);
+
+      if (index !== -1) {
+        this.activeNotes.splice(index, 1);
+
+        if (this.sustainPedal) {
+          this.sustainedNotes.push(noteName);
+        } else {
+          this.stopNote(noteName);
+        }
+
+        if (this.activeNotes.length < 3 && this.activeNotes.length > 0) {
+          // 当音符少于3个但仍有音符按下时，不再更新和弦
+          this.onOff = true;
+        } else if (this.activeNotes.length === 0) {
+          // 当所有音符释放后，录入和弦并关闭记录模式
+          if (this.maxNotesCount >= 3) {
+            this.addChordToSequence(this.maxChord);
+          }
+          this.maxNotesCount = 0;
+          this.maxChord = '';
+        }
+      }
+    },
+    async recognizeChord() {
+      if (this.activeNotes.length >= 3) {
+        try {
+          const sortedNotes = this.activeNotes
+              .map(note => ({
+                name: note,
+                midi: this.noteNameToMidi(note)
+              }))
+              .sort((a, b) => a.midi - b.midi)
+              .map(noteObj => noteObj.name);
+
+          const chordKey = this.hashChord(sortedNotes);
+
+          let chordName = localStorage.getItem(chordKey);
+          if (!chordName) {
+            const response = await Api.post('/chord/recognize/', {
+              notes: sortedNotes
+            });
+            chordName = response.data.chord_name;
+            localStorage.setItem(chordKey, chordName);
+          }
+
+          // 更新最大音符数及和弦
+          if (this.activeNotes.length > this.maxNotesCount) {
+            this.maxNotesCount = this.activeNotes.length;
+            this.maxChord = chordName;
+          }
+
+          this.recognizedChord = chordName;
+          this.onOff = false;
+        } catch (error) {
+          console.error('Chord recognition failed', error);
+        }
+      }
+    },
           `,
       ]
     }
@@ -164,12 +243,22 @@ export default {
 </script>
 <style scoped>
 /* 覆盖子组件的样式 */
+
+:deep(.el-collapse) {
+  width: 1800px; /* 为折叠面板设置固定宽度，包含边距和内边距 */
+  margin: auto; /* 可选：让折叠面板居中 */
+}
+
 :deep(.el-collapse-item__header) {
   background-color: transparent;
   font-size: 18px;
   padding: 12px;
   border-radius: 4px;
   color: #cdc0ff;
+  width: 1800px; /* 固定标题宽度 */
+  white-space: nowrap; /* 防止文字换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 使用省略号表示被截断的文本 */
 }
 
 :deep(.el-collapse-item__wrap) {
@@ -177,6 +266,10 @@ export default {
   padding: 12px;
   font-size: 16px;
   color: #cdc0ff;
+  width: 1800px; /* 固定内容宽度 */
+  white-space: nowrap; /* 防止文字换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 使用省略号表示被截断的文本 */
 }
 
 :deep(.el-image__inner) {
@@ -199,5 +292,9 @@ export default {
 .items {
   color: #dddddd;
   margin: 3px 3px 3px 3px;
+  width: 1800px; /* 固定内容区域宽度 */
+  white-space: nowrap; /* 防止文字换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 使用省略号表示被截断的文本 */
 }
 </style>
