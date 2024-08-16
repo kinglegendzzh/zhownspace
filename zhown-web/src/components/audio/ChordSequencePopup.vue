@@ -1,6 +1,6 @@
 <template>
   <div v-if="showPopup" class="chord-sequence-popup" @mousedown="startDrag($event)">
-    <span style="color: #c6c6ff">和弦序列</span>
+    <span style="color: #c6c6ff">和弦卷帘</span>
     <ul style="color: #dfdeff">
       <li v-for="(chord, index) in chordSequence" :key="index" class="chord-item">
         {{ chord }}

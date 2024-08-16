@@ -1,7 +1,7 @@
 <template>
   <div class="piano-">
-    <current-chord-display :recognizedChord="recognizedChord"/>
-    <div class="piano">
+    <current-chord-display v-if="showChord" :recognizedChord="recognizedChord"/>
+    <div v-if="showPiano" class="piano">
       <div v-for="(note) in keys"
            :key="note.midi"
            :id="'key-' + note.midi"
@@ -14,18 +14,20 @@
     </div>
 
     <!-- 操作按钮 -->
-    <div class="control-buttons">
-      <clear-chord-button @clear-chord-sequence="clearChordSequence"/>
-      <el-button size="small" type="info" @click="togglePopup" plain round class="custom-button">
+    <div v-if="showButtons" class="control-buttons">
+      <clear-chord-button v-if="showClear" @clear-chord-sequence="clearChordSequence"/>
+      <el-button v-if="showSeq" size="small" type="info" @click="togglePopup" plain round class="custom-button">
         {{ showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘' }}
       </el-button>
-      <el-button size="small" type="primary" @click="toggleToneLibrary" plain round class="custom-button">
+      <el-button v-if="showLib" size="small" type="primary" @click="toggleToneLibrary" plain round
+                 class="custom-button">
         切换音色库
       </el-button>
     </div>
 
     <!-- 和弦序列弹窗 -->
     <chord-sequence-popup
+        v-if="showSeq"
         :chordSequence="chordSequence"
         :showPopup="showPopup"
         ref="popup"
@@ -35,6 +37,7 @@
 
     <!-- 音色库窗口 -->
     <tone-library-popup
+        v-if="showLib"
         :tones="audioManager().tones"
         :showToneLibrary="showToneLibrary"
         @select-tone="selectTone"
@@ -56,6 +59,32 @@ export default {
     ToneLibraryPopup,
     CurrentChordDisplay,
     ChordSequencePopup,
+  },
+  props: {
+    showChord: {
+      type: Boolean,
+      default: true,
+    },
+    showPiano: {
+      type: Boolean,
+      default: true,
+    },
+    showButtons: {
+      type: Boolean,
+      default: true,
+    },
+    showSeq: {
+      type: Boolean,
+      default: true,
+    },
+    showLib: {
+      type: Boolean,
+      default: true,
+    },
+    showClear: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
