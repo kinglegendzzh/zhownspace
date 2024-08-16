@@ -59,12 +59,18 @@
             {{ item.label }}
           </el-tag>
         </template>
-        <div class="items">我使用musicpy开源库，实现了和弦的识别，并且在和弦结果的前端渲染方面，我通过如下变量，针对音符的输入释放事件进行了适配性的交互体验优化，如果你对这段代码感兴趣，欢迎参考。
+        <div class="items">我使用musicpy开源库，实现了和弦的识别，并且在和弦结果的前端渲染方面，我通过如下变量，针对音符的输入释放事件进行了适配性的交互体验优化，
+          如果你对这段代码感兴趣，
+          <span>
+            <el-link
+                href="https://github.com/kinglegendzzh/zhownspace/blob/main/zhown-web/src/components/audio/midi/VirtualMIDI.vue"
+                type="primary">代码片段</el-link>
+          </span>
+          欢迎参考。
           <emoji-icon emoji-name="whistle"/>
         </div>
-        <div class="items-code">
-          <highlighted-code :codeSnippet="code[0]"></highlighted-code>
-        </div>
+        <highlighted-code :codeSnippet="code[0]" style="text-align: left;  width: 50%;
+            display: inline-block;"></highlighted-code>
         <div class="items">你可以同时敲击字母A、D、G试试看呢～～
         </div>
         <el-divider content-position="center">
@@ -79,7 +85,6 @@
         </el-divider>
         <VirtualMIDI :show-lib="false" :show-seq="false" :show-buttons="false" :show-piano="false"
                      :show-clear="false"></VirtualMIDI>
-
         <div class="items">
           <emoji-icon emoji-name="-smiling"/>
           我还实现了一个小小的和弦卷帘弹窗，你可以随意拖动它～～（点击展开和弦卷帘，它会展示在屏幕右侧哦）
@@ -112,18 +117,18 @@ export default {
   },
   data() {
     return {
-      activeName: ['midiRenderTags', 'chords'],
+      activeName: [],
       midiRenderTags: [
+        {type: 'success', label: '音乐实验室', effect: 'dark'},
         {type: '', label: '已开源', effect: 'dark'},
-        {type: 'success', label: '音乐', effect: 'dark'},
         {type: 'danger', label: '可互动的', effect: 'dark'},
         {type: '', label: 'vue2', effect: 'plain'},
         {type: 'warning', label: 'web audio api', effect: 'plain'},
         {type: 'warning', label: 'tone.js', effect: 'plain'},
       ],
       chords: [
+        {type: 'success', label: '音乐实验室', effect: 'dark'},
         {type: '', label: '已开源', effect: 'dark'},
-        {type: 'success', label: '音乐', effect: 'dark'},
         {type: 'danger', label: '实时运算', effect: 'dark'},
         {type: 'warning', label: 'musicpy', effect: 'plain'},
         {type: 'warning', label: 'django', effect: 'plain'},
@@ -188,14 +193,11 @@ export default {
 
 :deep(.el-divider) {
   width: 70%;
-  margin: 40px auto;
+  display: inline-block;
 }
 
 .items {
   color: #dddddd;
   margin: 3px 3px 3px 3px;
-}
-.items-code {
-  text-align: left;
 }
 </style>
