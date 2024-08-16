@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from datetime import datetime
 
 # 设置文件保存路径
 localPath = 'lib/'
@@ -32,6 +33,7 @@ def calculate_md5(file):
 @csrf_exempt
 def upAudio(request):
     if request.method == 'POST':
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         file = request.FILES['file']
         fs = FileSystemStorage()
 
@@ -58,8 +60,8 @@ def upAudio(request):
         file_path = fs.path(filename)
 
         # 将文件信息插入数据库
-        cursor.execute('INSERT INTO audio_files (filename, file_path, file_md5) VALUES (?, ?, ?)',
-                       (file.name, file_path, file_md5))
+        cursor.execute('INSERT INTO audio_files (filename, file_path, file_md5, created_at) VALUES (?, ?, ?, ?)',
+                       (file.name, file_path, file_md5, current_time))
         conn.commit()
 
         # 获取文件ID

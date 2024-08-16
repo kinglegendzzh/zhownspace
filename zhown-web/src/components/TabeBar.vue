@@ -5,6 +5,7 @@
         :key="tab.name"
         :label="tab.label"
         :name="tab.name"
+        :lazy="true"
     >
       <router-view></router-view>
     </el-tab-pane>

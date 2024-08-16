@@ -20,9 +20,22 @@ class Comment(models.Model):
 class Album(models.Model):
     name = models.CharField(max_length=255)
     artist = models.CharField(max_length=255)
-    cover_image = models.ImageField(upload_to='album_covers/')
+    cover_image = models.BigIntegerField(null=True, blank=True)  # 用于存储封面图片的文件ID
     description = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    file_id = models.BigIntegerField(null=True, blank=True)  # 用于存储音频文件的文件ID
     def __str__(self):
         return self.name
+
+
+class AudioFile(models.Model):
+    filename = models.CharField(max_length=255)  # 文件名
+    file_path = models.TextField()  # 文件在服务器上的路径
+    file_md5 = models.CharField(max_length=32)  # 文件的MD5哈希值
+    created_at = models.DateTimeField(auto_now_add=True)  # 文件上传的时间戳
+
+    def __str__(self):
+        return self.filename
+
+    class Meta:
+        db_table = 'audio_files'  # 指定表名为audio_files

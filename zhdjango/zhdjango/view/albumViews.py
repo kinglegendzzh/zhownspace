@@ -1,27 +1,48 @@
-# views/album_views.py
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from article.models import Album
 from django.core.files.storage import FileSystemStorage
 import os
+import sqlite3
+import json
+
+from zhdjango import settings
+
+
+def get_db_connection():
+    db_path = os.path.join(settings.BASE_DIR, 'db.sqlite3')
+    print(f"Connecting to database at {db_path}")  # 添加打印以检查路径
+    conn = sqlite3.connect(db_path)
+    return conn
 
 
 @csrf_exempt
 def create_album(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        artist = request.POST.get('artist')
-        description = request.POST.get('description')
-        cover_image = request.FILES.get('cover_image')
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            artist = data.get('artist')
+            description = data.get('description')
+            cover_image_id = data.get('cover_image_id')
+            file_id = data.get('file_id')
 
-        if not all([name, artist, cover_image]):
-            return JsonResponse({'error': 'Name, artist, and cover image are required'}, status=400)
+            if not all([name, artist, cover_image_id, file_id]):
+                return JsonResponse({'error': 'Name, artist, cover image ID, and file ID are required'}, status=400)
 
-        album = Album(name=name, artist=artist, description=description, cover_image=cover_image)
-        album.save()
+            album = Album(
+                name=name,
+                artist=artist,
+                description=description,
+                cover_image=cover_image_id,
+                file_id=file_id
+            )
+            album.save()
 
-        return JsonResponse({'message': 'Album created successfully', 'album_id': album.id})
+            return JsonResponse({'message': 'Album created successfully', 'album_id': album.id})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -33,7 +54,8 @@ def get_album(request, album_id):
             'name': album.name,
             'artist': album.artist,
             'description': album.description,
-            'cover_image': album.cover_image.url
+            'cover_image_id': album.cover_image,
+            'file_id': album.file_id
         }
         return JsonResponse(response)
     except Album.DoesNotExist:
@@ -45,18 +67,21 @@ def update_album(request, album_id):
     if request.method == 'POST':
         try:
             album = Album.objects.get(id=album_id)
-            album.name = request.POST.get('name', album.name)
-            album.artist = request.POST.get('artist', album.artist)
-            album.description = request.POST.get('description', album.description)
+            data = json.loads(request.body)
 
-            if 'cover_image' in request.FILES:
-                album.cover_image = request.FILES['cover_image']
+            album.name = data.get('name', album.name)
+            album.artist = data.get('artist', album.artist)
+            album.description = data.get('description', album.description)
+            album.cover_image = data.get('cover_image_id', album.cover_image)
+            album.file_id = data.get('file_id', album.file_id)
 
             album.save()
 
             return JsonResponse({'message': 'Album updated successfully'})
         except Album.DoesNotExist:
             return JsonResponse({'error': 'Album not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -75,6 +100,6 @@ def delete_album(request, album_id):
 
 
 def list_albums(request):
-    albums = Album.objects.all().values('id', 'name', 'artist', 'description', 'cover_image')
+    albums = Album.objects.all().values('id', 'name', 'artist', 'description', 'cover_image', 'file_id')
     albums_list = list(albums)
     return JsonResponse(albums_list, safe=False)

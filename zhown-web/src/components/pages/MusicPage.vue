@@ -1,72 +1,112 @@
 <template>
-  <el-container class="album-container">
-    <el-row :gutter="20">
-      <el-col :xs="20" :sm="20" :md="11" :lg="5" :xl="2"
-              v-for="(album, index) in albums" :key="index"
-      >
-        <div
-            class="album-card"
-            @mouseover="startRotate(index)"
-            @mouseleave="stopRotate(index)"
+  <div>
+    <el-button @click="showCreateDialog = true" type="primary" style="margin-top: 20px;">创建新专辑</el-button>
+    <el-container class="album-container">
+      <div v-if="albums.length === 0">加载中...</div>
+      <el-row :gutter="300">
+        <el-col :xs="20" :sm="20" :md="11" :lg="5" :xl="2"
+                v-for="(album, index) in albums" :key="index"
         >
-          <div class="album-record-wrapper">
-            <div :class="['album-record', { 'rotating': rotatingIndex === index }]">
-              <div class="album-inner-circle">
-                <img :src="album.cover_image" alt="Album Cover" class="album-cover"/>
+          <div
+              class="album-card"
+              @mouseover="startRotate(index)"
+              @mouseleave="stopRotate(index)"
+          >
+            <div class="album-record-wrapper">
+              <div :class="['album-record', { 'rotating': rotatingIndex === index }]">
+                <div class="album-inner-circle">
+                  <img :src="album.coverImageUrl" alt="Album Cover" class="album-cover"/>
+                </div>
               </div>
             </div>
+            <div class="album-info">
+              <h3>{{ album.name }}</h3>
+              <p>{{ album.artist }}</p>
+              <el-button @click.stop="editAlbum(album)" type="text">编辑</el-button>
+              <el-button @click.stop="deleteAlbum(album.id)" type="text" class="delete-btn">删除</el-button>
+            </div>
           </div>
-          <div class="album-info">
-            <h3>{{ album.name }}</h3>
-            <p>{{ album.artist }}</p>
-            <el-button @click.stop="editAlbum(album)" type="text">编辑</el-button>
-            <el-button @click.stop="deleteAlbum(album.id)" type="text" class="delete-btn">删除</el-button>
-          </div>
-        </div>
-      </el-col>
-    </el-row>
-    <el-button @click="showCreateDialog = true" type="primary" style="margin-top: 20px;">创建新专辑</el-button>
+        </el-col>
+      </el-row>
 
-    <el-dialog title="创建新专辑" :visible.sync="showCreateDialog">
-      <el-form :model="form">
-        <el-form-item label="专辑名称">
-          <el-input v-model="form.name"></el-input>
-        </el-form-item>
-        <el-form-item label="艺术家">
-          <el-input v-model="form.artist"></el-input>
-        </el-form-item>
-        <el-form-item label="封面图片">
-          <el-input v-model="form.cover_image"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
+      <!-- 创建新专辑弹窗 -->
+      <el-dialog title="创建新专辑" :visible.sync="showCreateDialog">
+        <el-form :model="form">
+          <el-form-item label="专辑名称">
+            <el-input v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="艺术家">
+            <el-input v-model="form.artist"></el-input>
+          </el-form-item>
+          <el-form-item label="封面图片">
+            <el-upload
+                action="http://localhost:8000/zhown/up/"
+                list-type="picture"
+                :on-success="handleUploadSuccess"
+                :before-upload="beforeUpload"
+            >
+              <el-button slot="trigger" type="primary">上传图片</el-button>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="音频文件">
+            <el-upload
+                action="http://localhost:8000/zhown/up/"
+                list-type="text"
+                :on-success="handleAudioUploadSuccess"
+                :before-upload="beforeAudioUpload"
+            >
+              <el-button slot="trigger" type="primary">上传音频</el-button>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
         <el-button @click="showCreateDialog = false">取消</el-button>
         <el-button type="primary" @click="createAlbum">创建</el-button>
       </span>
-    </el-dialog>
+      </el-dialog>
 
-    <el-dialog title="编辑专辑" :visible.sync="showEditDialog">
-      <el-form :model="form">
-        <el-form-item label="专辑名称">
-          <el-input v-model="form.name"></el-input>
-        </el-form-item>
-        <el-form-item label="艺术家">
-          <el-input v-model="form.artist"></el-input>
-        </el-form-item>
-        <el-form-item label="封面图片">
-          <el-input v-model="form.cover_image"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
+      <!-- 编辑专辑弹窗 -->
+      <el-dialog title="编辑专辑" :visible.sync="showEditDialog">
+        <el-form :model="form">
+          <el-form-item label="专辑名称">
+            <el-input v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="艺术家">
+            <el-input v-model="form.artist"></el-input>
+          </el-form-item>
+          <el-form-item label="封面图片">
+            <el-upload
+                action="http://localhost:8000/zhown/up/"
+                list-type="picture"
+                :on-success="handleUploadSuccess"
+                :before-upload="beforeUpload"
+            >
+              <el-button slot="trigger" type="primary">重新上传图片</el-button>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="音频文件">
+            <el-upload
+                action="http://localhost:8000/zhown/up/"
+                list-type="text"
+                :on-success="handleAudioUploadSuccess"
+                :before-upload="beforeAudioUpload"
+            >
+              <el-button slot="trigger" type="primary">重新上传音频</el-button>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
         <el-button @click="showEditDialog = false">取消</el-button>
         <el-button type="primary" @click="updateAlbum">更新</el-button>
       </span>
-    </el-dialog>
-  </el-container>
+      </el-dialog>
+    </el-container>
+  </div>
 </template>
 
 <script>
-import Api from "@/utils/api";
+import api from "@/utils/api";
+// import _ from 'lodash';
 
 export default {
   name: "AlbumShowcase",
@@ -77,21 +117,39 @@ export default {
       showCreateDialog: false,
       showEditDialog: false,
       form: {
-        id: null,
+        file_id: null,
         name: '',
         artist: '',
-        cover_image: ''
-      }
+        cover_image_id: null  // 保存上传后的 file_id
+      },
     };
   },
   mounted() {
     this.fetchAlbums();
   },
+  created() {
+    // this.fetchAlbums();
+  },
   methods: {
+    // fetchAlbums: _.debounce(function () {
+    //   api.get('/api/albums/')
+    //       .then(response => {
+    //         this.albums = response.data;
+    //         this.albums.forEach((album, index) => {
+    //           this.getCoverImageUrl(album.cover_image, index);
+    //         });
+    //       })
+    //       .catch(error => {
+    //         console.error('Error fetching albums:', error);
+    //       });
+    // }, 300), // 300ms的防抖时间
     fetchAlbums() {
-      Api.get('/api/albums/')
+      api.get('/api/albums/')
           .then(response => {
             this.albums = response.data;
+            this.albums.forEach((album, index) => {
+              this.getCoverImageUrl(album.cover_image, index);
+            });
           })
           .catch(error => {
             console.error('Error fetching albums:', error);
@@ -103,11 +161,37 @@ export default {
     stopRotate() {
       this.rotatingIndex = null;
     },
+    async getCoverImageUrl(file_id, index) {
+      api.get('/get/', {file_id: file_id}, {responseType: 'blob'})
+          .then(response => {
+            const blob = response.data;
+            const imageUrl = URL.createObjectURL(blob);
+            this.$set(this.albums[index], 'coverImageUrl', imageUrl);
+          })
+          .catch(error => {
+            console.error('File upload failed:', error);
+          });
+    },
+    handleUploadSuccess(response) {
+      this.form.cover_image_id = response.file_id;  // 使用 file_id 关联图片
+    },
+    beforeUpload(file) {
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传图片只能是 JPG 或 PNG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
+    },
     createAlbum() {
-      Api.post('/api/album/', this.form)
+      api.post('/api/album/', this.form)
           .then(() => {
             this.showCreateDialog = false;
-            this.fetchAlbums(); // Refresh the list after creation
+            this.fetchAlbums(); // 创建成功后刷新列表
           })
           .catch(error => {
             console.error('Error creating album:', error);
@@ -118,24 +202,39 @@ export default {
       this.showEditDialog = true;
     },
     updateAlbum() {
-      Api.put(`/api/album/${this.form.id}/update/`, this.form)
+      api.post(`/api/album/${this.form.id}/update/`, this.form)
           .then(() => {
             this.showEditDialog = false;
-            this.fetchAlbums(); // Refresh the list after update
+            this.fetchAlbums(); // 更新成功后刷新列表
           })
           .catch(error => {
             console.error('Error updating album:', error);
           });
     },
     deleteAlbum(albumId) {
-      Api.delete(`/api/album/${albumId}/delete/`)
+      api.delete(`/api/album/${albumId}/delete/`)
           .then(() => {
-            this.fetchAlbums(); // Refresh the list after deletion
+            this.fetchAlbums(); // 删除成功后刷新列表
           })
           .catch(error => {
             console.error('Error deleting album:', error);
           });
-    }
+    },
+    handleAudioUploadSuccess(response) {
+      this.form.file_id = response.file_id;  // 使用 file_id 关联上传的音频文件
+    },
+    beforeAudioUpload(file) {
+      const isAudio = file.type === 'audio/mpeg' || file.type === 'audio/wav' || file.type === 'audio/mp3' || file.type === 'audio/flac';
+      const isLt20M = file.size / 1024 / 1024 < 20;
+
+      if (!isAudio) {
+        this.$message.error('上传的文件只能是 MP3 或 WAV 格式!');
+      }
+      if (!isLt20M) {
+        this.$message.error('上传文件大小不能超过 20MB!');
+      }
+      return isAudio && isLt20M;
+    },
   }
 };
 </script>
@@ -155,7 +254,7 @@ export default {
   cursor: pointer;
   width: 200px;
   height: 250px;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0);
   color: #333;
   border-radius: 10px;
   text-align: center;
@@ -181,7 +280,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 2s linear;
+  transition: transform 2s linear; /* 旋转速度减慢 */
 }
 
 .album-record.rotating {
@@ -210,7 +309,7 @@ export default {
 
 .album-info {
   padding: 10px;
-  background-color: rgba(193, 154, 107, 0.9);
+  background-color: rgba(193, 154, 107); /* 牛皮纸袋的颜色 */
   color: #fff;
   width: 100%;
   position: absolute;
@@ -233,9 +332,5 @@ export default {
 
 .album-card:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-.delete-btn {
-  color: #ff4949;
 }
 </style>
