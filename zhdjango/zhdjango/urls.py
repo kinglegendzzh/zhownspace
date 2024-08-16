@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+
+from .view.albumViews import create_album, get_album, update_album, delete_album, list_albums
 from .view.chordRecognitionView import ChordRecognitionView
 from .view.detail import article_detail
 from .view.upAudio import upAudio, getAudioStream
@@ -41,5 +43,10 @@ urlpatterns = [
     path('zhown/api/article/<int:article_id>/comments/create/', create_comment, name='create-comment'),
     path('zhown/api/comment/<int:comment_id>/delete/', delete_comment, name='delete-comment'),
     path('zhown/api/comment/<int:comment_id>/update/', update_comment, name='update-comment'),
-    path('zhown/api/articles/', list_articles, name='list-articles'),
+    path('zhown/api/articles/', list_articles, name='list-articles',),
+    path('zhown/api/album/', create_album, name='create-album'),
+    path('zhown/api/album/<int:album_id>/', get_album, name='get-album'),
+    path('zhown/api/album/<int:album_id>/update/', update_album, name='update-album'),
+    path('zhown/api/album/<int:album_id>/delete/', delete_album, name='delete-album'),
+    path('zhown/api/albums/', list_albums, name='list-albums'),
 ]

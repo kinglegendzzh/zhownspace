@@ -15,3 +15,14 @@ class Comment(models.Model):
     author = models.CharField(max_length=100)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Album(models.Model):
+    name = models.CharField(max_length=255)
+    artist = models.CharField(max_length=255)
+    cover_image = models.ImageField(upload_to='album_covers/')
+    description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

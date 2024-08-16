@@ -1,7 +1,7 @@
 <template>
   <el-container class="album-container">
-    <el-row :gutter="20">
-      <el-col :xs="24" :sm="24" :md="12" :lg="8" :xl="4"
+    <el-row :gutter="300">
+      <el-col :xs="20" :sm="20" :md="11" :lg="5" :xl="2"
               v-for="(album, index) in albums" :key="index"
       >
         <div
@@ -12,9 +12,10 @@
         >
           <div class="album-record-wrapper">
             <div :class="['album-record', { 'rotating': rotatingIndex === index }]">
-              <img :src="album.image" alt="Album Cover" class="album-cover"/>
+              <div class="album-inner-circle">
+                <img :src="album.image" alt="Album Cover" class="album-cover"/>
+              </div>
             </div>
-            <div class="album-sleeve"></div>
           </div>
           <div class="album-info">
             <h3>{{ album.name }}</h3>
@@ -77,8 +78,7 @@ export default {
   transition: box-shadow 0.3s;
   cursor: pointer;
   width: 200px;
-  height: 300px;
-  margin: 20px;
+  height: 250px;
   background-color: #fff;
   color: #333;
   border-radius: 10px;
@@ -91,23 +91,33 @@ export default {
   position: relative;
   width: 160px;
   height: 160px;
-  margin-top: 20px;
 }
 
 .album-record {
   position: absolute;
   top: 0;
-  left: 0;
+  left: -15px;
   width: 100%;
   height: 100%;
   border-radius: 50%;
   background-color: black;
-  overflow: hidden;
-  transition: transform 1s linear; /* 旋转速度可调整 */
+  border: 15px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 2s linear; /* 旋转速度减慢 */
 }
 
 .album-record.rotating {
-  animation: spin 2s linear infinite;
+  animation: spin 4s linear infinite;
+}
+
+.album-inner-circle {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: white;
 }
 
 @keyframes spin {
@@ -120,28 +130,16 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
-  clip-path: circle(50%);
-}
-
-.album-sleeve {
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  background-color: #c19a6b; /* 牛皮纸袋颜色 */
-  z-index: 1;
-  transform: translateY(30%);
 }
 
 .album-info {
   padding: 10px;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(193, 154, 107, 0.9); /* 牛皮纸袋的颜色 */
   color: #fff;
   width: 100%;
   position: absolute;
   bottom: 0;
+  border-radius: 0 0 10px 10px;
   transition: background-color 0.3s;
 }
 
