@@ -59,8 +59,11 @@
             {{ item.label }}
           </el-tag>
         </template>
-        <div class="items">我使用musicpy开源库，实现了和弦的识别
+        <div class="items">我使用musicpy开源库，实现了和弦的识别，并且在和弦结果的前端渲染方面，我通过如下变量，针对音符的输入释放事件进行了适配性的交互体验优化，如果你对这段代码感兴趣，欢迎参考。
           <emoji-icon emoji-name="whistle"/>
+        </div>
+        <div class="items-code">
+          <highlighted-code :codeSnippet="code[0]"></highlighted-code>
         </div>
         <div class="items">你可以同时敲击字母A、D、G试试看呢～～
         </div>
@@ -80,8 +83,14 @@
         <div class="items">
           <emoji-icon emoji-name="-smiling"/>
           我还实现了一个小小的和弦卷帘弹窗，你可以随意拖动它～～（点击展开和弦卷帘，它会展示在屏幕右侧哦）
-          <span><VirtualMIDI :show-lib="false" :show-piano="false"
-                             :show-chord="false"></VirtualMIDI></span>
+          <VirtualMIDI :show-lib="false" :show-piano="false"
+                       :show-chord="false"></VirtualMIDI>
+        </div>
+        <div class="items">
+          <emoji-icon emoji-name="-kiss-"/>
+          不仅如此，我基于soundfonts设计了一个在线音色库，你可以实时切换你想要的好听音色哦！
+          <VirtualMIDI :show-piano="false" :show-seq="false" :show-clear="false"
+                       :show-chord="false"></VirtualMIDI>
         </div>
       </el-collapse-item>
     </el-collapse>
@@ -91,10 +100,12 @@
 import VirtualMIDISimple from "@/components/audio/midi/VirtualMIDISimple.vue";
 import EmojiIcon from "@/components/mini/EmojiIcon.vue";
 import VirtualMIDI from "@/components/audio/midi/VirtualMIDI.vue";
+import HighlightedCode from "@/components/mini/HighlightedCode.vue";
 
 export default {
   name: "CodeLabPage",
   components: {
+    HighlightedCode,
     VirtualMIDI,
     VirtualMIDISimple,
     EmojiIcon,
@@ -117,6 +128,31 @@ export default {
         {type: 'warning', label: 'musicpy', effect: 'plain'},
         {type: 'warning', label: 'django', effect: 'plain'},
       ],
+      code: [
+        `
+  data() {
+    return {
+      keys: [],
+      onOff: false, //记录模式开关
+      activeNotes: [], // 用于存储按下的音符
+      preNotes: [], // 用于存储按下的音符
+      recognizedChord: '', // 识别到的和弦
+      maxChord: '', // 音符最多时的和弦
+      maxNotesCount: 0, // 记录最多音符时的数量
+
+      chordSequence: [], // 用于存储和弦序列的数组
+      isDragging: false, // 用于控制拖动的标识
+      dragOffsetX: 0,
+      dragOffsetY: 0,
+      showPopup: false, // 控制弹窗显示/隐藏的标识
+      showToneLibrary: false, // 控制音色库窗口显示/隐藏的标识
+
+      sustainPedal: false, // 用于跟踪踏板状态
+      sustainedNotes: [], // 用于跟踪正在延音的音符
+    };
+  },
+          `,
+      ]
     }
   }
 };
@@ -158,5 +194,8 @@ export default {
 .items {
   color: #dddddd;
   margin: 3px 3px 3px 3px;
+}
+.items-code {
+  text-align: left;
 }
 </style>

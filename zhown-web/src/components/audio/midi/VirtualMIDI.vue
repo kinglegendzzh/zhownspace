@@ -25,7 +25,6 @@
       </el-button>
     </div>
 
-    <!-- 和弦序列弹窗 -->
     <chord-sequence-popup
         v-if="showSeq"
         :chordSequence="chordSequence"
@@ -35,11 +34,11 @@
         @start-drag="startDrag($event, 'popup')"
     />
 
-    <!-- 音色库窗口 -->
     <tone-library-popup
         v-if="showLib"
         :tones="audioManager().tones"
         :showToneLibrary="showToneLibrary"
+        ref="toneLibrary"
         @select-tone="selectTone"
         @start-drag="startDrag($event, 'toneLibrary')"
     />
@@ -113,7 +112,7 @@ export default {
         // 添加更多键位映射到你需要的音符
       },
       keys: [],
-      onOff: false,
+      onOff: false, //记录模式开关
       activeNotes: [], // 用于存储按下的音符
       preNotes: [], // 用于存储按下的音符
       recognizedChord: '', // 识别到的和弦
@@ -374,10 +373,17 @@ export default {
       }
       this.chordSequence.push(chord);
     },
-    startDrag(event) {
+    startDrag(event, refName) {
       this.$nextTick(() => {
-        const element = this.$refs.popup.$el; // 获取组件的根元素
-        if (element) {
+        const element = this.$refs[refName]; // 获取指定的引用元素
+        if (element && element.$el) {
+          this.isDragging = true;
+          this.dragOffsetX = event.clientX - element.$el.getBoundingClientRect().left;
+          this.dragOffsetY = event.clientY - element.$el.getBoundingClientRect().top;
+          document.addEventListener('mousemove', this.drag);
+          document.addEventListener('mouseup', this.stopDrag);
+        } else if (element) {
+          // 处理直接引用 DOM 元素的情况
           this.isDragging = true;
           this.dragOffsetX = event.clientX - element.getBoundingClientRect().left;
           this.dragOffsetY = event.clientY - element.getBoundingClientRect().top;
@@ -388,7 +394,7 @@ export default {
     },
     drag(event) {
       if (this.isDragging) {
-        const element = this.$refs.popup.$el; // 获取组件的根元素
+        const element = this.$refs.popup ? this.$refs.popup.$el : this.$refs.popup;
         if (element) {
           element.style.left = `${event.clientX - this.dragOffsetX}px`;
           element.style.top = `${event.clientY - this.dragOffsetY}px`;

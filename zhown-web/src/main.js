@@ -88,6 +88,8 @@ import {
     Message,
     Notification
 } from 'element-ui';
+import VueHighlightJS from 'vue-highlightjs';
+import 'highlight.js/styles/github.css'; // 使用 GitHub 风格的代码高亮
 
 Vue.use(Pagination);
 Vue.use(Dialog);
@@ -189,6 +191,7 @@ Vue.prototype.$prompt = MessageBox.prompt;
 Vue.prototype.$notify = Notification;
 Vue.prototype.$message = Message;
 
+Vue.use(VueHighlightJS);
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false
