@@ -1,8 +1,6 @@
 <template>
   <div class="piano-">
-    <div class="chord-display">
-      <h2>当前和弦: <span v-if="recognizedChord">{{ recognizedChord }}</span></h2>
-    </div>
+    <current-chord-display :recognizedChord="recognizedChord"/>
     <div class="piano">
       <div v-for="(note) in keys"
            :key="note.midi"
@@ -17,9 +15,7 @@
 
     <!-- 操作按钮 -->
     <div class="control-buttons">
-      <el-button size="small" type="warning" @click="clearChordSequence" plain round class="custom-button">
-        清除和弦
-      </el-button>
+      <clear-chord-button @clear-chord-sequence="clearChordSequence"/>
       <el-button size="small" type="info" @click="togglePopup" plain round class="custom-button">
         {{ showPopup ? '隐藏和弦卷帘' : '展示和弦卷帘' }}
       </el-button>
@@ -28,36 +24,39 @@
       </el-button>
     </div>
 
-    <!-- 音色库窗口 -->
-    <div v-if="showToneLibrary" class="tone-library-popup" ref="toneLibrary"
-         @mousedown="startDrag($event, 'toneLibrary')">
-      <span style="color: #c6c6ff">音色库</span>
-      <ul style="color: #dfdeff">
-        <li v-for="(url, toneName) in audioManager().tones" :key="toneName" @click="selectTone(toneName)">
-          {{ toneName }}
-        </li>
-      </ul>
-    </div>
-
     <!-- 和弦序列弹窗 -->
-    <div v-if="showPopup" class="chord-sequence-popup" ref="popup" @mousedown="startDrag($event, 'popup')">
-      <span style="color: #c6c6ff">和弦序列</span>
-      <ul style="color: #dfdeff">
-        <li v-for="(chord, index) in chordSequence" :key="index" class="chord-item">
-          {{ chord }}
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteChord(index)"
-                     class="delete-button"></el-button>
-        </li>
-      </ul>
-    </div>
+    <chord-sequence-popup
+        :chordSequence="chordSequence"
+        :showPopup="showPopup"
+        ref="popup"
+        @delete-chord="deleteChord"
+        @start-drag="startDrag($event, 'popup')"
+    />
+
+    <!-- 音色库窗口 -->
+    <tone-library-popup
+        :tones="audioManager().tones"
+        :showToneLibrary="showToneLibrary"
+        @select-tone="selectTone"
+        @start-drag="startDrag($event, 'toneLibrary')"
+    />
   </div>
 </template>
-
 <script>
 import Api from "@/utils/api";
 import audioManager from "@/utils/audioManager";
+import CurrentChordDisplay from '@/components/audio/CurrentChordDisplay.vue';
+import ChordSequencePopup from '@/components/audio/ChordSequencePopup.vue';
+import ToneLibraryPopup from '@/components/audio/ToneLibraryPopup.vue';
+import ClearChordButton from "@/components/audio/ClearChordButton.vue";
 
 export default {
+  components: {
+    ClearChordButton,
+    ToneLibraryPopup,
+    CurrentChordDisplay,
+    ChordSequencePopup,
+  },
   data() {
     return {
       midiAccess: null,
@@ -96,7 +95,7 @@ export default {
       isDragging: false, // 用于控制拖动的标识
       dragOffsetX: 0,
       dragOffsetY: 0,
-      showPopup: true, // 控制弹窗显示/隐藏的标识
+      showPopup: false, // 控制弹窗显示/隐藏的标识
       showToneLibrary: false, // 控制音色库窗口显示/隐藏的标识
 
       sustainPedal: false, // 用于跟踪踏板状态
@@ -347,27 +346,31 @@ export default {
       }
       this.chordSequence.push(chord);
     },
-    startDrag(event, elementRef) {
-      this.isDragging = true;
-      const element = this.$refs[elementRef];
-      this.dragOffsetX = event.clientX - element.getBoundingClientRect().left;
-      this.dragOffsetY = event.clientY - element.getBoundingClientRect().top;
-      document.addEventListener('mousemove', this.drag);
-      document.addEventListener('mouseup', this.stopDrag);
-      this.draggingElement = elementRef;
+    startDrag(event) {
+      this.$nextTick(() => {
+        const element = this.$refs.popup.$el; // 获取组件的根元素
+        if (element) {
+          this.isDragging = true;
+          this.dragOffsetX = event.clientX - element.getBoundingClientRect().left;
+          this.dragOffsetY = event.clientY - element.getBoundingClientRect().top;
+          document.addEventListener('mousemove', this.drag);
+          document.addEventListener('mouseup', this.stopDrag);
+        }
+      });
     },
     drag(event) {
       if (this.isDragging) {
-        const element = this.$refs[this.draggingElement];
-        element.style.left = `${event.clientX - this.dragOffsetX}px`;
-        element.style.top = `${event.clientY - this.dragOffsetY}px`;
+        const element = this.$refs.popup.$el; // 获取组件的根元素
+        if (element) {
+          element.style.left = `${event.clientX - this.dragOffsetX}px`;
+          element.style.top = `${event.clientY - this.dragOffsetY}px`;
+        }
       }
     },
     stopDrag() {
       this.isDragging = false;
       document.removeEventListener('mousemove', this.drag);
       document.removeEventListener('mouseup', this.stopDrag);
-      this.draggingElement = null;
     },
     clearChordSequence() {
       this.chordSequence = [];
@@ -386,12 +389,16 @@ export default {
       this.showToneLibrary = false;
     },
     startToneDrag(event) {
-      this.isDragging = true;
-      const toneLibrary = this.$refs.toneLibrary;
-      this.dragOffsetX = event.clientX - toneLibrary.getBoundingClientRect().left;
-      this.dragOffsetY = event.clientY - toneLibrary.getBoundingClientRect().top;
-      document.addEventListener('mousemove', this.drag);
-      document.addEventListener('mouseup', this.stopDrag);
+      this.$nextTick(() => {
+        const element = this.$refs.toneLibrary.$el;
+        if (element) {
+          this.isDragging = true;
+          this.dragOffsetX = event.clientX - element.getBoundingClientRect().left;
+          this.dragOffsetY = event.clientY - element.getBoundingClientRect().top;
+          document.addEventListener('mousemove', this.drag);
+          document.addEventListener('mouseup', this.stopDrag);
+        }
+      });
     },
   }
 
