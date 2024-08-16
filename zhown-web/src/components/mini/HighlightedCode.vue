@@ -91,6 +91,7 @@ export default {
     hljs.registerLanguage('javascript', javascript);
     this.currentCode = this.codeSnippet;
     this.cmOptions.mode = this.codes.find((k) => k.label === this.language).value;
+    console.log('ccccc', this.currentCode);
   },
   methods: {
     highlightCode() {

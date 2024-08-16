@@ -69,7 +69,7 @@
           欢迎参考。
           <emoji-icon emoji-name="whistle"/>
         </div>
-        <highlighted-code :codeSnippet="code[0]" style="text-align: left;  width: 50%;
+        <highlighted-code :codeSnippet="code[0]" :type="1" style="text-align: left;  width: 50%;
             display: inline-block;"></highlighted-code>
         <div class="items">你可以同时敲击字母A、D、G试试看呢～～
         </div>

@@ -41,8 +41,8 @@ export default {
         },
         {
           name: 'second',
-          img: "linear-gradient(to top, #fe5196 0%, #f77062 100%)",
-          textColor: "#060073",
+          img: "linear-gradient(-20deg, #ddd6f3 0%, #faaca8 100%, #faaca8 100%)",
+          textColor: "#173B45",
           desc: "和弦、旋律、节奏，构建20,000赫茲的听觉艺术。",
           label: "章浩的音乐"
         },
