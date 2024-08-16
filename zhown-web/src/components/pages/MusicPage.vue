@@ -40,7 +40,7 @@
           </el-form-item>
           <el-form-item label="封面图片">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                action="http://192.168.1.4:8000/zhown/up/"
                 list-type="picture"
                 :on-success="handleUploadSuccess"
                 :before-upload="beforeUpload"
@@ -50,7 +50,7 @@
           </el-form-item>
           <el-form-item label="音频文件">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                action="http://192.168.1.4:8000/zhown/up/"
                 list-type="text"
                 :on-success="handleAudioUploadSuccess"
                 :before-upload="beforeAudioUpload"
@@ -76,7 +76,7 @@
           </el-form-item>
           <el-form-item label="封面图片">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                action="http://192.168.1.4:8000/zhown/up/"
                 list-type="picture"
                 :on-success="handleUploadSuccess"
                 :before-upload="beforeUpload"
@@ -86,7 +86,7 @@
           </el-form-item>
           <el-form-item label="音频文件">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                action="http://192.168.1.4:8000/zhown/up/"
                 list-type="text"
                 :on-success="handleAudioUploadSuccess"
                 :before-upload="beforeAudioUpload"
@@ -309,7 +309,7 @@ export default {
 
 .album-info {
   padding: 10px;
-  background-color: rgba(193, 154, 107); /* 牛皮纸袋的颜色 */
+  background-color: rgb(122, 83, 32); /* 牛皮纸袋的颜色 */
   color: #fff;
   width: 100%;
   position: absolute;

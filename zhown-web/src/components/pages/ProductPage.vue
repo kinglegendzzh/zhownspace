@@ -6,8 +6,8 @@
           <div :class="['product-glass', { 'highlighted': highlightedIndex === index }]"></div>
           <img :src="product.image" alt="Product Image" class="product-image"/>
           <div class="product-info">
-            <h3>{{ product.name }}</h3>
-            <p>{{ product.description }}</p>
+            <h3 style="color: #000000">{{ product.name }}</h3>
+            <p style="color: #43423d">{{ product.description }}</p>
           </div>
         </div>
       </el-col>
@@ -28,7 +28,7 @@ export default {
           url: "chordprediction",
         },
         {
-          name: 'ZhownMusic音乐在线创作服务',
+          name: 'ZhownMusic音乐在线创作',
           description: '集成了各类机器学习与AI音频大模型工具，让创作变得更简单。',
           image: require('@/assets/icons/钢琴老师-01.svg'),
           url: "zhownmusic",

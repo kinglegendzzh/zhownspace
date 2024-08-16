@@ -24,7 +24,11 @@ SECRET_KEY = 'django-insecure-!a6vceuv@@vvl_sc+w@%9umas_ast9fn#8z4g7!q^iaq6ic&85
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '192.168.1.4',
+]
 
 # Application definition
 
@@ -136,5 +140,6 @@ CORS_ORIGIN_ALLOW_ALL = True  # 或者配置具体允许的域名
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8080',  # 前端运行的地址
     'http://127.0.0.1:8080',  # 如果你也可能使用本地 IP 访问
+    'http://192.168.1.4:8080',
     # 你还可以添加其他受信任的域名
 ]

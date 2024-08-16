@@ -19,7 +19,8 @@ function getCookie(name) {
 
 // 创建一个axios实例
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/zhown', // 默认后端API的基础URL
+  // baseURL: 'http://localhost:8000/zhown', // 默认后端API的基础URL
+  baseURL: 'http://192.168.1.4:8000/zhown', // 默认后端API的基础URL
   timeout: 10000, // 请求超时设定
   headers: {
     'Content-Type': 'application/json',
