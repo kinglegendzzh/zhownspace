@@ -87,6 +87,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    sound: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -276,7 +280,9 @@ export default {
     addNoteToActive(note, velocity = 127) {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
-        this.playNote(noteName, velocity);
+        if (this.sound) {
+          this.playNote(noteName, velocity);
+        }
         this.activeNotes.push(noteName);
 
         if (this.activeNotes.length === 3) {
@@ -320,7 +326,9 @@ export default {
     releaseSustainedNotes() {
       while (this.sustainedNotes.length > 0) {
         const note = this.sustainedNotes.pop();
-        this.stopNote(note);
+        if (this.sound) {
+          this.stopNote(note);
+        }
       }
     },
     async recognizeChord() {

@@ -23,6 +23,12 @@ import audioManager from "@/utils/audioManager";
 
 export default {
   components: {},
+  props: {
+    sound: {
+      type: Boolean,
+      default: true,
+    },
+  },
   data() {
     return {
       midiAccess: null,
@@ -209,7 +215,9 @@ export default {
     addNoteToActive(note, velocity = 127) {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
-        this.playNote(noteName, velocity);
+        if (this.sound) {
+          this.playNote(noteName, velocity);
+        }
         this.activeNotes.push(noteName);
 
         if (this.activeNotes.length === 3) {
@@ -234,7 +242,9 @@ export default {
         if (this.sustainPedal) {
           this.sustainedNotes.push(noteName);
         } else {
-          this.stopNote(noteName);
+          if (this.sound) {
+            this.stopNote(noteName);
+          }
         }
 
         if (this.activeNotes.length < 3 && this.activeNotes.length > 0) {

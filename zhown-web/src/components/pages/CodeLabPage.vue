@@ -84,18 +84,18 @@
           <el-icon class="el-icon-bottom"></el-icon>
         </el-divider>
         <VirtualMIDI :show-lib="false" :show-seq="false" :show-buttons="false" :show-piano="false"
-                     :show-clear="false"></VirtualMIDI>
+                     :show-clear="false" :sound="false"></VirtualMIDI>
         <div class="items">
           <emoji-icon emoji-name="-smiling"/>
           我还实现了一个小小的和弦卷帘弹窗，你可以随意拖动它～～（点击展开和弦卷帘，它会展示在屏幕右侧哦）
           <VirtualMIDI :show-lib="false" :show-piano="false"
-                       :show-chord="false"></VirtualMIDI>
+                       :show-chord="false" :sound="false"></VirtualMIDI>
         </div>
         <div class="items">
           <emoji-icon emoji-name="-kiss-"/>
           不仅如此，我基于soundfonts设计了一个在线音色库，你可以实时切换你想要的好听音色哦！
           <VirtualMIDI :show-piano="false" :show-seq="false" :show-clear="false"
-                       :show-chord="false"></VirtualMIDI>
+                       :show-chord="false" :sound="false"></VirtualMIDI>
         </div>
       </el-collapse-item>
     </el-collapse>
