@@ -7,10 +7,10 @@
            :id="'key-' + note.midi"
            :class="['piano-key', note.isBlack ? 'black-key' : 'white-key']"
            :ref="'key-' + note.midi"
-           @mousedown="playNote(midiToNoteName(note.midi))"
-           @mouseup="stopNote(midiToNoteName(note.midi))"
-           @touchstart.prevent="playNoteOnTouch(midiToNoteName(note.midi))"
-           @touchend.prevent="stopNoteOnTouch(midiToNoteName(note.midi))"
+           @mousedown="playNoteOnTouch(note.midi)"
+           @mouseup="stopNoteOnTouch(note.midi)"
+           @touchstart.prevent="playNoteOnTouch(note.midi)"
+           @touchend.prevent="stopNoteOnTouch(note.midi)"
       >
         <div v-if="note.label" class="key-label">{{ note.label }}</div>
       </div>
@@ -160,10 +160,12 @@ export default {
   },
   methods: {
     playNoteOnTouch(note) {
-      this.playNote(note);
+      this.renderKey(note, 72);
+      this.addNoteToActive(note);
     },
     stopNoteOnTouch(note) {
-      this.stopNote(note);
+      this.renderKey(note, 0);
+      this.removeNoteFromActive(note);
     },
     audioManager() {
       return audioManager;
