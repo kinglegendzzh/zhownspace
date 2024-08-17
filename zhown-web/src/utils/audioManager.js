@@ -66,9 +66,12 @@ class AudioManager {
         return true;
     }
 
-    playNote(note) {
+    playNote(note, velocity = 127) {
         if (this.sampler) {
-            this.sampler.triggerAttack(note);
+            // 将MIDI Velocity（0-127）映射到Tone.js音量范围（0.0-1.0）
+            const volume = velocity / 127;
+            console.log('volume', volume);
+            this.sampler.triggerAttack(note, "+0", volume);
         }
     }
 

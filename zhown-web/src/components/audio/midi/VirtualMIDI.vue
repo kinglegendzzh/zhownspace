@@ -170,8 +170,8 @@ export default {
     audioManager() {
       return audioManager;
     },
-    playNote(note) {
-      audioManager.playNote(note); // 使用音频管理器播放音符
+    playNote(note, velocity = 127) {
+      audioManager.playNote(note, velocity); // 使用音频管理器播放音符
     },
     stopNote(note) {
       audioManager.stopNote(note); // 使用音频管理器停止音符
@@ -236,7 +236,7 @@ export default {
 
       if (command === 144 && velocity !== 0) { // Note on
         this.renderKey(note, velocity);
-        this.addNoteToActive(note);
+        this.addNoteToActive(note, velocity);
       } else if (command === 144) { // Note off
         this.renderKey(note, 0);
         this.removeNoteFromActive(note);
@@ -273,10 +273,10 @@ export default {
         }
       }
     },
-    addNoteToActive(note) {
+    addNoteToActive(note, velocity = 127) {
       const noteName = this.midiToNoteName(note);
       if (!this.activeNotes.includes(noteName)) {
-        this.playNote(noteName);
+        this.playNote(noteName, velocity);
         this.activeNotes.push(noteName);
 
         if (this.activeNotes.length === 3) {
