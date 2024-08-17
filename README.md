@@ -24,7 +24,7 @@
 
 ![image](https://github.com/user-attachments/assets/b5484e2c-0c12-49df-ada0-40b1e6071178)
 
-![image](https://github.com/user-attachments/assets/414a5e85-ccdb-4780-8829-ff548034f0e1)
+![image](https://github.com/user-attachments/assets/c4d3872c-8fc6-4893-8d4f-cf91d5e29b25)
 
 
 > 如果你对此项目颇感兴趣，欢迎随时关注我的github开发进展，本人属于业余时间倒腾开发，用爱发电中，如果你有兴趣与我合作，或者有一些不错的开发建议与创意点子，欢迎与我联系。
