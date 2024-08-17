@@ -19,7 +19,7 @@
 7. [x] **博客系统**：文件上传下载的基本框架
 8. [x] **博客系统**：音乐专辑页
 
-## 系统预览图
+## 系统部分预览图
 ![image](https://github.com/user-attachments/assets/380e2657-81f3-4ede-b778-e2d53758feca)
 
 ![image](https://github.com/user-attachments/assets/b5484e2c-0c12-49df-ada0-40b1e6071178)

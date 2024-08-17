@@ -101,15 +101,19 @@
       </span>
       </el-dialog>
     </el-container>
+    <el-divider></el-divider>
+    <AudioWaveform></AudioWaveform>
   </div>
 </template>
 
 <script>
 import api from "@/utils/api";
+import AudioWaveform from "@/components/audio/AudioWaveform.vue";
 // import _ from 'lodash';
 
 export default {
   name: "AlbumShowcase",
+  components: {AudioWaveform},
   data() {
     return {
       albums: [],
