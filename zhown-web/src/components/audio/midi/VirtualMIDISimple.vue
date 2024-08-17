@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-import Api from "@/utils/api";
+// import Api from "@/utils/api";
 import audioManager from "@/utils/audioManager";
 
 export default {
@@ -269,32 +269,32 @@ export default {
     async recognizeChord() {
       if (this.activeNotes.length >= 3) {
         try {
-          const sortedNotes = this.activeNotes
-              .map(note => ({
-                name: note,
-                midi: this.noteNameToMidi(note)
-              }))
-              .sort((a, b) => a.midi - b.midi)
-              .map(noteObj => noteObj.name);
+          // const sortedNotes = this.activeNotes
+          //     .map(note => ({
+          //       name: note,
+          //       midi: this.noteNameToMidi(note)
+          //     }))
+          //     .sort((a, b) => a.midi - b.midi)
+          //     .map(noteObj => noteObj.name);
 
-          const chordKey = this.hashChord(sortedNotes);
+          // const chordKey = this.hashChord(sortedNotes);
 
-          let chordName = localStorage.getItem(chordKey);
-          if (!chordName) {
-            const response = await Api.post('/chord/recognize/', {
-              notes: sortedNotes
-            });
-            chordName = response.data.chord_name;
-            localStorage.setItem(chordKey, chordName);
-          }
+          // let chordName = localStorage.getItem(chordKey);
+          // if (!chordName) {
+          //   const response = await Api.post('/chord/recognize/', {
+          //     notes: sortedNotes
+          //   });
+          //   chordName = response.data.chord_name;
+          //   localStorage.setItem(chordKey, chordName);
+          // }
 
           // 更新最大音符数及和弦
           if (this.activeNotes.length > this.maxNotesCount) {
             this.maxNotesCount = this.activeNotes.length;
-            this.maxChord = chordName;
+            // this.maxChord = chordName;
           }
 
-          this.recognizedChord = chordName;
+          // this.recognizedChord = chordName;
           this.onOff = false;
         } catch (error) {
           console.error('Chord recognition failed', error);
