@@ -68,9 +68,11 @@ class AudioManager {
 
     playNote(note, velocity = 127) {
         if (this.sampler) {
-            // 将MIDI Velocity（0-127）映射到Tone.js音量范围（0.0-1.0）
-            const volume = velocity / 127;
-            console.log('volume', volume);
+            // 使用指数曲线将MIDI力度映射到音量
+            const minVolume = 0.2;  // 设置最低音量，避免太小而无声
+            const maxVolume = 1.0;
+            const volume = minVolume + (Math.pow(velocity / 127, 3) * (maxVolume - minVolume));
+
             this.sampler.triggerAttack(note, "+0", volume);
         }
     }
