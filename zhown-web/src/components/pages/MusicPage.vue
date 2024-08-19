@@ -40,7 +40,7 @@
           </el-form-item>
           <el-form-item label="封面图片">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                :action="upFilePath"
                 list-type="picture"
                 :on-success="handleUploadSuccess"
                 :before-upload="beforeUpload"
@@ -50,7 +50,7 @@
           </el-form-item>
           <el-form-item label="音频文件">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                :action="upFilePath"
                 list-type="text"
                 :on-success="handleAudioUploadSuccess"
                 :before-upload="beforeAudioUpload"
@@ -76,7 +76,7 @@
           </el-form-item>
           <el-form-item label="封面图片">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                :action="upFilePath"
                 list-type="picture"
                 :on-success="handleUploadSuccess"
                 :before-upload="beforeUpload"
@@ -86,7 +86,7 @@
           </el-form-item>
           <el-form-item label="音频文件">
             <el-upload
-                action="http://localhost:8000/zhown/up/"
+                :action="upFilePath"
                 list-type="text"
                 :on-success="handleAudioUploadSuccess"
                 :before-upload="beforeAudioUpload"
@@ -120,6 +120,7 @@ export default {
       rotatingIndex: null,
       showCreateDialog: false,
       showEditDialog: false,
+      upFilePath: null,
       form: {
         file_id: null,
         name: '',
@@ -129,12 +130,18 @@ export default {
     };
   },
   mounted() {
+    this.setUpFilePath();
     this.fetchAlbums();
   },
   created() {
     // this.fetchAlbums();
   },
   methods: {
+    setUpFilePath() {
+      const fileUpUrl = api.getURL() + '/up/'
+      console.log('fileUpUrl', fileUpUrl);
+      this.upFilePath = fileUpUrl;
+    },
     // fetchAlbums: _.debounce(function () {
     //   api.get('/api/albums/')
     //       .then(response => {

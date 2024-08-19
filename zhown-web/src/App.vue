@@ -3,11 +3,13 @@
     <el-header class="app-header">
       <el-switch
           style="position: absolute; top: 10px; right: 10px;"
-          v-model="switchValue"
+          v-model="isProd"
           active-color="#13ce66"
           inactive-color="#ff4949"
           active-text="在线模式"
-          inactive-text="离线模式">
+          inactive-text="离线模式"
+          @change="toggleEnv"
+      >
       </el-switch>
       <h1 class="animated-title" :style="{color: textColor}">{{ firstTitle.displayText }}
         <span v-if="firstTitle.showCaret" class="caret"></span>
@@ -31,6 +33,7 @@
 
 <script>
 import TabeBar from "@/components/TabeBar.vue";
+import {setBaseURL} from "@/utils/api";
 
 export default {
   name: "App",
@@ -39,7 +42,7 @@ export default {
   },
   data() {
     return {
-      switchValue: false,
+      isProd: false, // 默认是开发环境
       backImg: 'linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%)',
       textColor: '#180161',
       firstTitle: {
@@ -58,6 +61,14 @@ export default {
     };
   },
   mounted() {
+    if (!localStorage.getItem("isProd")) {
+      console.log('init localStorage', localStorage.getItem('isProd'));
+      this.toggleEnv(this.isProd);
+    } else {
+      let isProd = localStorage.getItem("isProd") === '1';
+      this.isProd = isProd;
+      this.toggleEnv(isProd);
+    }
     this.initializeAnimation();
     window.addEventListener("focus", this.onPageFocus);
   },
@@ -65,6 +76,15 @@ export default {
     window.removeEventListener("focus", this.onPageFocus);
   },
   methods: {
+    toggleEnv(isProd) {
+      if (isProd) {
+        setBaseURL('http://192.168.1.4:8000/zhown');
+        localStorage.setItem("isProd", '1');
+      } else {
+        setBaseURL('http://localhost:8000/zhown');
+        localStorage.setItem("isProd", '0');
+      }
+    },
     updateBackgroundImg({background, textColor, desc, label}) {
       console.log('Received new background image:', background);
       this.backImg = background;
