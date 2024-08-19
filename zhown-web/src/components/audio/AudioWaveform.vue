@@ -4,7 +4,7 @@
     <el-upload
         class="custom-upload"
         drag
-        action="http://192.168.1.4:8000/zhown/up/"
+        action="http://localhost:8000/zhown/up/"
         multiple
         :on-success="handleUploadSuccess">
       <img src='@/assets/icons/一键发行.svg' alt="music_up"/>

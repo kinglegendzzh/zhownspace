@@ -245,7 +245,7 @@ export default {
 /* 覆盖子组件的样式 */
 
 :deep(.el-collapse) {
-  width: 1800px; /* 为折叠面板设置固定宽度，包含边距和内边距 */
+  width: 1300px; /* 为折叠面板设置固定宽度，包含边距和内边距 */
   margin: auto; /* 可选：让折叠面板居中 */
 }
 
@@ -255,7 +255,7 @@ export default {
   padding: 12px;
   border-radius: 4px;
   color: #cdc0ff;
-  width: 1800px; /* 固定标题宽度 */
+  width: 1300px; /* 固定标题宽度 */
   white-space: nowrap; /* 防止文字换行 */
   overflow: hidden; /* 隐藏超出部分 */
   text-overflow: ellipsis; /* 使用省略号表示被截断的文本 */
@@ -266,7 +266,7 @@ export default {
   padding: 12px;
   font-size: 16px;
   color: #cdc0ff;
-  width: 1800px; /* 固定内容宽度 */
+  width: 1300px; /* 固定内容宽度 */
   white-space: nowrap; /* 防止文字换行 */
   overflow: hidden; /* 隐藏超出部分 */
   text-overflow: ellipsis; /* 使用省略号表示被截断的文本 */
@@ -292,7 +292,7 @@ export default {
 .items {
   color: #dddddd;
   margin: 3px 3px 3px 3px;
-  width: 1800px; /* 固定内容区域宽度 */
+  width: 1300px; /* 固定内容区域宽度 */
   white-space: nowrap; /* 防止文字换行 */
   overflow: hidden; /* 隐藏超出部分 */
   text-overflow: ellipsis; /* 使用省略号表示被截断的文本 */
