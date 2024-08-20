@@ -4,7 +4,7 @@
     <el-upload
         class="custom-upload"
         drag
-        action="http://localhost:8000/zhown/up/"
+        :action="upFilePath"
         multiple
         :on-success="handleUploadSuccess">
       <img src='@/assets/icons/一键发行.svg' alt="music_up"/>
@@ -36,6 +36,7 @@ export default {
       tracks: [],  // 存储音频文件的URL
       analyser: null,
       dataArray: null,
+      upFilePath: '',
     };
   },
   mounted() {
@@ -43,18 +44,24 @@ export default {
     this.wavesurfer = WaveSurfer.create({
       container: this.$refs.waveform,
       waveColor: 'violet',
-        progressColor: 'purple',
-        cursorColor: 'navy',
-        height: 128,
-        responsive: true,
-        interact: true,
-        barWidth: 2,
-        normalize: true,
+      progressColor: 'purple',
+      cursorColor: 'navy',
+      height: 128,
+      responsive: true,
+      interact: true,
+      barWidth: 2,
+      normalize: true,
     });
     this.initDrag();
     console.log('mounted');
+    this.setUpFilePath();
   },
   methods: {
+    setUpFilePath() {
+      const fileUpUrl = api.getURL() + '/up/'
+      console.log('fileUpUrl', fileUpUrl);
+      this.upFilePath = fileUpUrl;
+    },
     handleUploadSuccess(response, file) {
       console.log('文件上传成功:', file.name);
       const file_id = response.file_id;

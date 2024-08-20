@@ -120,7 +120,7 @@ export default {
       rotatingIndex: null,
       showCreateDialog: false,
       showEditDialog: false,
-      upFilePath: null,
+      upFilePath: '',
       form: {
         file_id: null,
         name: '',
