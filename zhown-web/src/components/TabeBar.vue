@@ -28,8 +28,8 @@ export default {
         },
         {
           name: 'page',
-          img: "linear-gradient(-225deg, #F9F7F7 0%, #DBE2EF 48%, #3F72AF 100%)",
-          textColor: "#112D4E", desc: "一些技术报告",
+          img: "linear-gradient(-10deg, #180161 0%, #5800bc 48%, #180161 100%)",
+          textColor: "#acdd55", desc: "一些技术报告",
           label: "章浩的一些研究性文章"
         },
         {
