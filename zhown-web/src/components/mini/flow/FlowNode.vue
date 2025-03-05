@@ -1,17 +1,13 @@
-<!-- src/components/mini/flow/FlowNode.vue -->
 <template>
   <div class="node" :class="node.type"
        :style="{ position:'absolute', left: node.x + 'px', top: node.y + 'px' }">
     <div class="node-title">{{ node.label }}</div>
     <div class="ports">
-      <!-- 输出端口 (拖拽连接起点) -->
+      <!-- 输出端口，发起连线拖拽 -->
       <div class="port output-port"
-           draggable="true"
-           @dragstart="onPortDragStart(node.id, $event)"></div>
-      <!-- 输入端口 (拖拽连接终点) -->
-      <div class="port input-port"
-           @dragover.prevent
-           @drop="onPortDrop(node.id, $event)"></div>
+           @mousedown="handleOutputMouseDown($event)"></div>
+      <!-- 输入端口，接收连线 -->
+      <div class="port input-port" :data-node-id="node.id"></div>
     </div>
   </div>
 </template>
@@ -25,7 +21,9 @@ export default {
   },
   mounted() {
     const vm = this;
+    // 节点拖拽（排除端口区域）
     interact(this.$el).draggable({
+      ignoreFrom: '.port',
       listeners: {
         move(event) {
           const dx = event.dx;
@@ -35,20 +33,16 @@ export default {
           vm.$store.commit("UPDATE_NODE_POSITION", { id: vm.node.id, x: newX, y: newY });
         },
         end() {
-          // 拖拽结束，不需要使用事件参数
+          // 拖拽结束处理（如需额外逻辑，可添加）
         }
       }
     });
   },
   methods: {
-    onPortDragStart(id, event) {
-      event.dataTransfer.setData("sourceNode", id);
-    },
-    onPortDrop(targetId, event) {
-      const sourceId = event.dataTransfer.getData("sourceNode");
-      if (sourceId) {
-        this.$store.commit("ADD_CONNECTION", { source: parseInt(sourceId), target: targetId });
-      }
+    handleOutputMouseDown(event) {
+      // 通知父组件开始连线拖拽
+      this.$emit('start-connection', this.node.id, event);
+      event.stopPropagation(); // 防止启动画布平移
     }
   }
 };
@@ -63,14 +57,17 @@ export default {
   border-radius: 4px;
   text-align: center;
   cursor: move;
+  position: absolute;
 }
 .node-title { font-size: 14px; margin: 5px; }
 .ports { position: relative; width: 100%; height: 0; }
 .port {
-  width: 10px; height: 10px;
-  background: #555; border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: #555;
+  border-radius: 50%;
   position: absolute;
 }
-.output-port { right: -5px; top: 50%; transform: translateY(-50%); }
+.output-port { right: -5px; top: 50%; transform: translateY(-50%); cursor: crosshair; }
 .input-port  { left: -5px; top: 50%; transform: translateY(-50%); }
 </style>
