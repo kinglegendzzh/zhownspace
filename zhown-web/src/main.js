@@ -3,12 +3,15 @@ import App from './App.vue'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Router from 'vue-router';
+import store from './utils/store.js';
 import ProductPage from '@/components/pages/ProductPage.vue';
 import ArticlePage from '@/components/pages/ArticlePage.vue';
 import CodeLabPage from '@/components/pages/CodeLabPage.vue';
 import MusicPage from '@/components/pages/MusicPage.vue';
 import GalleryPage from '@/components/pages/GalleryPage.vue';
 import AboutPage from '@/components/pages/AboutPage.vue';
+import ZhownMusic from "@/components/pages/ZhownMusic.vue";
+import ChordPrediction from "@/components/pages/ChordPrediction.vue";
 import {
     Pagination,
     Dialog,
@@ -177,8 +180,8 @@ const router = new Router({
         {path: '/second', component: MusicPage},
         {path: '/third', component: GalleryPage},
         {path: '/five', component: AboutPage},
-        {path: '/zhownmusic', component: AboutPage},
-        {path: '/chordprediction', component: AboutPage},
+        {path: '/zhownmusic', component: ZhownMusic},
+        {path: '/chordprediction', component: ChordPrediction},
         {path: '/', redirect: '/product'} // 默认重定向到 /product
     ]
 });
@@ -197,6 +200,7 @@ Vue.use(ElementUI);
 Vue.config.productionTip = false
 
 new Vue({
+    store,
     router,
     render: h => h(App),
 }).$mount('#app')
